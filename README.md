@@ -34,15 +34,15 @@ To get a local copy up and running follow these steps.
 1. Clone the repository
 2. Change directory
    ```sh
-   cd power-up-arquetipo-v3
+   cd power-up-v4-restaurants-v1
    ```
-3. Create a new database in MySQL called powerup
+3. Create a new database in MySQL called plazoleta
 4. Update the database connection settings
    ```yml
    # src/main/resources/application-dev.yml
    spring:
       datasource:
-          url: jdbc:mysql://localhost/powerup
+          url: jdbc:mysql://localhost:3306/plazoleta
           username: root
           password: <your-password>
    ```
@@ -53,7 +53,7 @@ To get a local copy up and running follow these steps.
 ## Usage
 
 1. Right-click the class PowerUpApplication and choose Run
-2. Open [http://localhost:8090/swagger-ui/index.html](http://localhost:8090/swagger-ui/index.html) in your web browser
+2. Open [http://localhost:8091/swagger-ui/index.html](http://localhost:8091/swagger-ui/index.html) in your web browser
 
 <!-- ROADMAP -->
 ## Tests

@@ -1,35 +1,29 @@
-INSERT INTO `person` (
-    `id`,
-    `address`,
-    `dni_number`,
-    `id_dni_type`,
-    `id_person_type`,
-    `mail`,
-    `name`,
-    `password`,
-    `phone`,
-    `surname`,
-    `token_password`
-  )
+
+INSERT INTO `plazoleta`.`restaurant`
+(
+`address`,
+`id_owner`,
+`name`,
+`nit`,
+`phone`,
+`url_logo`
+)
 VALUES
-  (
-    '1',
-    'st 123 # 456',
-    '123',
-    '1',
-    '1',
-    'email@some.com',
-    'Name',
-    '$2a$10$GlsGSNhkbVon6ZOSNMptOu5RikedRzlCAhMa7YpwvUSS0c88WT99S',
-    '1234567890',
-    'Surname',
-    NULL
-  );
+(
+234,
+1,
+"testRestaurant",
+12345677,
+"+53322222222",
+"http://url_test.com");
 
+INSERT INTO `plazoleta`.`food_order`(`date`,`id_chef`,`id_client`,`status`,`id_restaurant`)
+VALUES("2020-06-01 00:00:00.000000",1,2,1,1);
 
-INSERT INTO `role` (`id`, `description`, `name`) VALUES ('4', 'ROLE_ADMIN', 'ROLE_ADMIN');
-INSERT INTO `role` (`id`, `description`, `name`) VALUES ('3', 'ROLE_OWNER', 'ROLE_OWNER');
-INSERT INTO `role` (`id`, `description`, `name`) VALUES ('2', 'ROLE_EMPLOYEE', 'ROLE_EMPLOYEE');
-INSERT INTO `role` (`id`, `description`, `name`) VALUES ('1', 'ROLE_CLIENT', 'ROLE_CLIENT');
+INSERT INTO `plazoleta`.`category`(`description`,`name`)VALUES("TestDescription","pizza");
 
-INSERT INTO `user` (`id_person`, `id_role`) VALUES ('1', '1');
+INSERT INTO `plazoleta`.`dish`(`active`,`description`,`name`,`price`,`url_image`,`id_category`,`id_restaurant`)
+VALUES(1,"dishTest","dishDescription",123455,"http://testImage.com",1,1);
+
+INSERT INTO `plazoleta`.`order_dish`(`amount`,`id_dish`,`id_order`)VALUES(2,1,1);
+
