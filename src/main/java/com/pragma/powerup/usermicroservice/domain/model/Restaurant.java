@@ -1,6 +1,7 @@
 package com.pragma.powerup.usermicroservice.domain.model;
 
 public class Restaurant {
+    private Long id;
     private String name;
     private String address;
     private Long idOwner;
@@ -8,13 +9,22 @@ public class Restaurant {
     private String urlLogo;
     private Integer nit;
 
-    public Restaurant(String name, String address, Long idOwner, String phone, String urlLogo, Integer nit) {
+    public Restaurant(Long id, String name, String address, Long idOwner, String phone, String urlLogo, Integer nit) {
+        this.id = id;
         this.name = name;
         this.address = address;
         this.idOwner = idOwner;
         this.phone = phone;
         this.urlLogo = urlLogo;
         this.nit = nit;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {

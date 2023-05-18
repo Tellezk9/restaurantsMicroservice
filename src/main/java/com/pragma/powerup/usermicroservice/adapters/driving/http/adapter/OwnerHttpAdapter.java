@@ -1,6 +1,7 @@
 package com.pragma.powerup.usermicroservice.adapters.driving.http.adapter;
 
 import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.exceptions.UserNotFoundException;
+import com.pragma.powerup.usermicroservice.adapters.driving.http.exceptions.ErrorExecutionException;
 import com.pragma.powerup.usermicroservice.adapters.driving.http.exceptions.UserRoleNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,16 +31,15 @@ public class OwnerHttpAdapter {
         try {
             String url = urlToOwner + "owner/getOwner/" + id;
             ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
-            if (response.getStatusCode().is2xxSuccessful()) {
-                Map<String, String> responseData = response.getBody();
-                if (responseData == null) {
-                    throw new UserNotFoundException();
-                }
-            } else {
+
+            if (!response.getStatusCode().is2xxSuccessful()) {
                 throw new UserRoleNotFoundException();
             }
+            if (response.getBody() == null) {
+                throw new UserNotFoundException();
+            }
         } catch (Exception ex) {
-            throw new UserRoleNotFoundException();
+            throw new ErrorExecutionException();
         }
     }
 }
