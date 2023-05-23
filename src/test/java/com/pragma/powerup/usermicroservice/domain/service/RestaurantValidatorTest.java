@@ -1,6 +1,5 @@
 package com.pragma.powerup.usermicroservice.domain.service;
 
-import com.pragma.powerup.usermicroservice.adapters.driving.http.dto.request.RestaurantRequestDto;
 import com.pragma.powerup.usermicroservice.domain.exceptions.EmptyFieldFoundException;
 import com.pragma.powerup.usermicroservice.domain.exceptions.InvalidRestaurantNameException;
 import com.pragma.powerup.usermicroservice.domain.model.Restaurant;
@@ -21,7 +20,7 @@ class RestaurantValidatorTest {
 
     @Test
     void allFieldsFilled() {
-        Restaurant restaurant = new Restaurant("testName", "string", 4L, "+439094230412", "string", 123);
+        Restaurant restaurant = new Restaurant(1L,"testName", "string", 4L, "+439094230412", "string", 123);
         assertTrue(() -> restaurantValidator.allFieldsFilled(restaurant));
     }
     @ParameterizedTest
@@ -35,7 +34,7 @@ class RestaurantValidatorTest {
     })
     void allFieldsWithoutParams(String name, String address, Long idOwner, String phone, String urlLogo, Integer nit) {
 
-        Restaurant restaurant = new Restaurant(name,address,idOwner,phone,urlLogo,nit);
+        Restaurant restaurant = new Restaurant(1L,name,address,idOwner,phone,urlLogo,nit);
 
         assertThrows(EmptyFieldFoundException.class, () -> restaurantValidator.allFieldsFilled(restaurant));
     }
@@ -48,7 +47,7 @@ class RestaurantValidatorTest {
     @Test
     void isRestaurantNameInValid() {
         assertThrows(InvalidRestaurantNameException.class,()-> restaurantValidator.isRestaurantNameValid("123"));
-        assertThrows(InvalidRestaurantNameException.class,()-> restaurantValidator.isRestaurantNameValid("asd"));
+        assertTrue(()-> restaurantValidator.isRestaurantNameValid("asd"));
     }
 
 }

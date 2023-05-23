@@ -82,4 +82,28 @@ class ValidatorTest {
         assertThrows(EmptyFieldFoundException.class, () -> validator.isValidMail(""));
     }
 
+    @Test
+    void isValidUrl() {
+        assertTrue(() -> validator.isValidUrl("http://www.test.com/test"));
+        assertTrue(() -> validator.isValidUrl("https://www.test.com/test"));
+    }
+
+    @Test
+    void isInvalidUrl() {
+        assertThrows(InvalidFormatUrlException.class, () -> validator.isValidUrl("www.test.com/test"));
+        assertThrows(InvalidFormatUrlException.class, () -> validator.isValidUrl("http://www.test"));
+        assertThrows(InvalidFormatUrlException.class, () -> validator.isValidUrl("https://www.test"));
+        assertThrows(InvalidFormatUrlException.class, () -> validator.isValidUrl("www.test"));
+    }
+
+    @Test
+    void isStringFilled() {
+        assertTrue(validator.isStringFilled("test"));
+    }
+
+    @Test
+    void isStringEmpty() {
+        assertThrows(EmptyFieldFoundException.class, () -> validator.isStringFilled(""));
+        assertThrows(EmptyFieldFoundException.class, () -> validator.isStringFilled(null));
+    }
 }

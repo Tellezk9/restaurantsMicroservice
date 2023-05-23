@@ -1,13 +1,9 @@
 package com.pragma.powerup.usermicroservice.configuration;
 
-import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.exceptions.MailAlreadyExistsException;
-import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.exceptions.NoDataFoundException;
-import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.exceptions.PersonAlreadyExistsException;
-import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.exceptions.PersonNotFoundException;
-import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.exceptions.RoleNotAllowedForCreationException;
-import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.exceptions.RoleNotFoundException;
-import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.exceptions.UserAlreadyExistsException;
-import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.exceptions.UserNotFoundException;
+import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.exceptions.*;
+import com.pragma.powerup.usermicroservice.adapters.driving.http.exceptions.ErrorExecutionException;
+import com.pragma.powerup.usermicroservice.adapters.driving.http.exceptions.UserRoleNotFoundException;
+import com.pragma.powerup.usermicroservice.domain.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
@@ -22,16 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static com.pragma.powerup.usermicroservice.configuration.Constants.MAIL_ALREADY_EXISTS_MESSAGE;
-import static com.pragma.powerup.usermicroservice.configuration.Constants.NO_DATA_FOUND_MESSAGE;
-import static com.pragma.powerup.usermicroservice.configuration.Constants.PERSON_ALREADY_EXISTS_MESSAGE;
-import static com.pragma.powerup.usermicroservice.configuration.Constants.PERSON_NOT_FOUND_MESSAGE;
-import static com.pragma.powerup.usermicroservice.configuration.Constants.RESPONSE_ERROR_MESSAGE_KEY;
-import static com.pragma.powerup.usermicroservice.configuration.Constants.ROLE_NOT_ALLOWED_MESSAGE;
-import static com.pragma.powerup.usermicroservice.configuration.Constants.ROLE_NOT_FOUND_MESSAGE;
-import static com.pragma.powerup.usermicroservice.configuration.Constants.USER_ALREADY_EXISTS_MESSAGE;
-import static com.pragma.powerup.usermicroservice.configuration.Constants.USER_NOT_FOUND_MESSAGE;
-import static com.pragma.powerup.usermicroservice.configuration.Constants.WRONG_CREDENTIALS_MESSAGE;
+import static com.pragma.powerup.usermicroservice.configuration.Constants.*;
 
 @ControllerAdvice
 public class ControllerAdvisor {
@@ -40,8 +27,7 @@ public class ControllerAdvisor {
     public ResponseEntity<Object> handleValidationException(MethodArgumentNotValidException ex) {
         List<String> errorMessages = new ArrayList<>();
         for (ObjectError error : ex.getBindingResult().getAllErrors()) {
-            if (error instanceof FieldError) {
-                FieldError fieldError = (FieldError) error;
+            if (error instanceof FieldError fieldError) {
                 errorMessages.add(fieldError.getField() + ": " + fieldError.getDefaultMessage());
             } else {
                 errorMessages.add(error.getDefaultMessage());
@@ -103,5 +89,51 @@ public class ControllerAdvisor {
             RoleNotFoundException roleNotFoundException) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, ROLE_NOT_FOUND_MESSAGE));
+    }
+
+    @ExceptionHandler(InvalidRestaurantNameException.class)
+    public ResponseEntity<Map<String,String>> invalidRestaurantNameException(
+            InvalidRestaurantNameException invalidRestaurantNameException
+    ){
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, INVALID_RESTAURANT_NAME_MESSAGE));
+    }
+    @ExceptionHandler(UserIsNotOfLegalAgeException.class)
+    public ResponseEntity<Map<String,String>> userIsNotOfLegalAgeException(
+            UserIsNotOfLegalAgeException userIsNotOfLegalAgeException
+    ){
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, USER_IS_NOT_LEGAL_AGE));
+    }
+
+    @ExceptionHandler(RestaurantAlreadyExistsException.class)
+    public ResponseEntity<Map<String,String>> restaurantAlreadyExistsException(
+            RestaurantAlreadyExistsException restaurantAlreadyExistsException
+    ){
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, RESTAURANT_ALREADY_EXISTS_MESSAGE));
+    }
+    @ExceptionHandler(UserRoleNotFoundException.class)
+    public ResponseEntity<Map<String, String>>userRoleNotFoundException(UserRoleNotFoundException userRoleNotFoundException){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, USER_NOT_FOUND_WITH_ROLE_MESSAGE));
+    }
+
+    @ExceptionHandler(InvalidFormatUrlException.class)
+    public ResponseEntity<Map<String, String>>invalidFormatUrlException(InvalidFormatUrlException invalidFormatUrlException){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, INVALID_FORMAT_URL_MESSAGE));
+    }
+
+    @ExceptionHandler(InvalidPriceException.class)
+    public ResponseEntity<Map<String, String>>invalidPriceException(InvalidPriceException invalidPriceException){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, INVALID_PRICE_MESSAGE));
+    }
+
+    @ExceptionHandler(ErrorExecutionException.class)
+    public ResponseEntity<Map<String, String>>errorExcecutionException(ErrorExecutionException errorExcecutionException){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, RESPONSE_ERROR_EXECUTION));
     }
 }

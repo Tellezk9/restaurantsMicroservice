@@ -18,13 +18,13 @@ public class RestaurantValidator {
         }
         return true;
     }
-    public boolean isRestaurantNameValid(String name){
-        String pattern = "^(?=.*[0-9])(?=.*[a-zA-Z])[a-zA-Z0-9]+$";
-        if (name.matches(pattern)){
-            return true;
+    public boolean isRestaurantNameValid(String name) {
+        try {
+            if (Integer.valueOf(name) > 0) {
+                throw new InvalidRestaurantNameException();
+            }
+        } catch (NumberFormatException ex) {
         }
-        else {
-            throw new InvalidRestaurantNameException();
-        }
+        return true;
     }
 }

@@ -54,4 +54,19 @@ public class Validator {
         return true;
     }
 
+    public boolean isValidUrl(String url) {
+        if (url == null || url.isEmpty()) {
+            throw new InvalidFormatUrlException();
+        }
+        if (!((url.contains("https://") || (url.contains("http://"))) && url.contains(".com/"))) {
+            throw new InvalidFormatUrlException();
+        }
+        return true;
+    }
+    public boolean isStringFilled(String data){
+        if (data == null || data.isEmpty()){
+            throw new EmptyFieldFoundException();
+        }
+        return true;
+    }
 }

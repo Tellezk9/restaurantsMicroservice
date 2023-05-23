@@ -21,10 +21,10 @@ public class DishEntity {
     @JoinColumn(name = "id_category")
     private CategoryEntity categoryEntity;
     private String description;
-    private Long price;
+    private Integer price;
     @ManyToOne
     @JoinColumn(name = "id_restaurant")
     private RestaurantEntity restaurantEntity;
     private String urlImage;
-    private Long active;
+    private Boolean active;
 }

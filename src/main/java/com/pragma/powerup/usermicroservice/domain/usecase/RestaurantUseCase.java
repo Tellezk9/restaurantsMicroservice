@@ -6,22 +6,32 @@ import com.pragma.powerup.usermicroservice.domain.service.RestaurantValidator;
 import com.pragma.powerup.usermicroservice.domain.service.Validator;
 import com.pragma.powerup.usermicroservice.domain.spi.IRestaurantPersistencePort;
 
+import java.util.List;
+
 public class RestaurantUseCase implements IRestaurantServicePort {
     private final IRestaurantPersistencePort restaurantPersistencePort;
+    public final Validator validator;
+    public final RestaurantValidator restaurantValidator;
 
     public RestaurantUseCase(IRestaurantPersistencePort restaurantPersistencePort) {
+        this.restaurantValidator = new RestaurantValidator();
+        this.validator = new Validator();
         this.restaurantPersistencePort = restaurantPersistencePort;
     }
 
     public void saveRestaurant(Restaurant restaurant) {
-        RestaurantValidator restaurantValidator = new RestaurantValidator();
-        Validator validator = new Validator();
 
         restaurantValidator.allFieldsFilled(restaurant);
         restaurantValidator.isRestaurantNameValid(restaurant.getName());
         validator.isValidPhone(restaurant.getPhone());
+        validator.isValidUrl(restaurant.getUrlLogo());
 
 
         restaurantPersistencePort.saveRestaurant(restaurant);
     }
+
+    public List<Restaurant> getRestaurants() {
+        return restaurantPersistencePort.getRestaurants();
+    }
+
 }
