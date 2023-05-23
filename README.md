@@ -42,7 +42,7 @@ To get a local copy up and running follow these steps.
    # src/main/resources/application-dev.yml
    spring:
       datasource:
-          url: jdbc:mysql://localhost:3306/plazoleta
+          url: jdbc:mysql://localhost:<your-MySQL-port>/plazoleta
           username: root
           password: <your-password>
    ```
@@ -53,7 +53,8 @@ To get a local copy up and running follow these steps.
 ## Usage
 
 1. Right-click the class PowerUpApplication and choose Run
-2. Open [http://localhost:8091/swagger-ui/index.html](http://localhost:8091/swagger-ui/index.html) in your web browser
+2. You must run the User Microservice project
+3. Open [http://localhost:8091/swagger-ui/index.html](http://localhost:8091/swagger-ui/index.html) in your web browser
 
 <!-- ROADMAP -->
 ## Tests
