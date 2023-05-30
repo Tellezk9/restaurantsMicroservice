@@ -58,14 +58,33 @@ public class Validator {
         if (url == null || url.isEmpty()) {
             throw new InvalidFormatUrlException();
         }
-        if (!((url.contains("https://") || (url.contains("http://"))) && url.contains(".com/"))) {
+        if (!(url.contains("https://") || (url.contains("http://")))) {
             throw new InvalidFormatUrlException();
         }
         return true;
     }
-    public boolean isStringFilled(String data){
-        if (data == null || data.isEmpty()){
+
+    public boolean isStringFilled(String data) {
+        if (data == null || data.isEmpty()) {
             throw new EmptyFieldFoundException();
+        }
+        return true;
+    }
+
+    public boolean isIdValid(Integer id) {
+        if (id == null || id <= 0) {
+            throw new EmptyFieldFoundException();
+        }
+        return true;
+    }
+
+
+    public boolean hasRoleValid(String authRole, String validRole) {
+        if ((authRole == null || authRole.isEmpty() ) || (validRole == null || validRole.isEmpty())) {
+            throw new EmptyFieldFoundException();
+        }
+        if (!authRole.equals(validRole)) {
+            throw new RoleNotAllowedForThisActionException();
         }
         return true;
     }

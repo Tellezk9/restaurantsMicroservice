@@ -21,4 +21,4 @@ management:
 
 app:
   urls:
-    urlToOwner: "http://localhost:8090/"
+    urlToUserMicroService: "http://localhost:8090/"

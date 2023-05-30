@@ -2,6 +2,7 @@ package com.pragma.powerup.usermicroservice.domain.service;
 
 import com.pragma.powerup.usermicroservice.domain.exceptions.EmptyFieldFoundException;
 import com.pragma.powerup.usermicroservice.domain.exceptions.InvalidPriceException;
+import com.pragma.powerup.usermicroservice.domain.exceptions.NotOwnerTheRestaurantException;
 import com.pragma.powerup.usermicroservice.domain.model.Dish;
 
 public class DishValidator {
@@ -22,6 +23,16 @@ public class DishValidator {
     public boolean isValidPrice(Integer price) {
         if (price == null || price <= 0) {
             throw new InvalidPriceException();
+        }
+        return true;
+    }
+
+    public boolean isTheRestaurantOwner(Long idOwner, Long idAuthUser) {
+        if ((idOwner == null || idOwner <= 0) || (idAuthUser == null|| idAuthUser <= 0)) {
+            throw new EmptyFieldFoundException();
+        }
+        if (!idOwner.equals(idAuthUser)) {
+            throw new NotOwnerTheRestaurantException();
         }
         return true;
     }

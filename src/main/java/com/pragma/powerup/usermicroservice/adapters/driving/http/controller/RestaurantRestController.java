@@ -1,6 +1,5 @@
 package com.pragma.powerup.usermicroservice.adapters.driving.http.controller;
 
-import com.pragma.powerup.usermicroservice.adapters.driving.http.adapter.OwnerHttpAdapter;
 import com.pragma.powerup.usermicroservice.adapters.driving.http.dto.request.RestaurantRequestDto;
 import com.pragma.powerup.usermicroservice.adapters.driving.http.dto.response.RestaurantResponseDto;
 import com.pragma.powerup.usermicroservice.adapters.driving.http.handlers.IRestaurantHandler;
@@ -27,7 +26,6 @@ import java.util.Map;
 @SecurityRequirement(name = "jwt")
 public class RestaurantRestController {
     private final IRestaurantHandler restaurantHandler;
-    private final OwnerHttpAdapter ownerHttpAdapter;
 
     @Operation(summary = "Add a new restaurant",
             responses = {
@@ -42,7 +40,6 @@ public class RestaurantRestController {
             })
     @PostMapping()
     public ResponseEntity<Map<String, String>> saveRestaurant(@Valid @RequestBody RestaurantRequestDto restaurantRequestDto) {
-        ownerHttpAdapter.getOwner(restaurantRequestDto.getIdOwner());
         restaurantHandler.saveRestaurant(restaurantRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.RESTAURANT_CREATED_MESSAGE));

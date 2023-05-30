@@ -87,23 +87,40 @@ class ValidatorTest {
         assertTrue(() -> validator.isValidUrl("http://www.test.com/test"));
         assertTrue(() -> validator.isValidUrl("https://www.test.com/test"));
     }
-
     @Test
     void isInvalidUrl() {
         assertThrows(InvalidFormatUrlException.class, () -> validator.isValidUrl("www.test.com/test"));
-        assertThrows(InvalidFormatUrlException.class, () -> validator.isValidUrl("http://www.test"));
-        assertThrows(InvalidFormatUrlException.class, () -> validator.isValidUrl("https://www.test"));
-        assertThrows(InvalidFormatUrlException.class, () -> validator.isValidUrl("www.test"));
+        assertThrows(InvalidFormatUrlException.class, () -> validator.isValidUrl("test"));
     }
 
     @Test
     void isStringFilled() {
         assertTrue(validator.isStringFilled("test"));
     }
-
     @Test
     void isStringEmpty() {
         assertThrows(EmptyFieldFoundException.class, () -> validator.isStringFilled(""));
         assertThrows(EmptyFieldFoundException.class, () -> validator.isStringFilled(null));
+    }
+
+    @Test
+    void isIdValid() {
+        assertTrue(validator.isIdValid(1));
+    }
+    @Test
+    void isIdInvalid() {
+        assertThrows(EmptyFieldFoundException.class, () -> validator.isIdValid(null));
+        assertThrows(EmptyFieldFoundException.class, () -> validator.isIdValid(0));
+        assertThrows(EmptyFieldFoundException.class, () -> validator.isIdValid(-1));
+    }
+
+    @Test
+    void hasRoleValid() {
+        assertTrue(validator.hasRoleValid("ROLE_TEST","ROLE_TEST"));
+    }
+    @Test
+    void hasRoleInvalid() {
+        assertThrows(EmptyFieldFoundException.class, () -> validator.hasRoleValid("",""));
+        assertThrows(RoleNotAllowedForThisActionException.class, () -> validator.hasRoleValid("ROLE_TEST","ROLE_TEST_FAKE"));
     }
 }
