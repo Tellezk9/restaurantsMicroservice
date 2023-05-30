@@ -1,7 +1,6 @@
 package com.pragma.powerup.usermicroservice.adapters.driving.http.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pragma.powerup.usermicroservice.adapters.driving.http.adapter.OwnerHttpAdapter;
 import com.pragma.powerup.usermicroservice.adapters.driving.http.dto.request.RestaurantRequestDto;
 import com.pragma.powerup.usermicroservice.adapters.driving.http.dto.response.RestaurantResponseDto;
 import com.pragma.powerup.usermicroservice.adapters.driving.http.handlers.IRestaurantHandler;
@@ -32,8 +31,6 @@ class RestaurantRestControllerTest {
 
     @Mock
     private IRestaurantHandler restaurantHandler;
-    @Mock
-    private OwnerHttpAdapter ownerHttpAdapter;
     @InjectMocks
     private RestaurantRestController restaurantRestController;
 
@@ -48,7 +45,6 @@ class RestaurantRestControllerTest {
     void saveRestaurant() throws Exception {
         RestaurantRequestDto restaurantRequestDto = new RestaurantRequestDto("testName", "string", 4, "+439094230412", "string", 123);
         doNothing().when(restaurantHandler).saveRestaurant(Mockito.any(RestaurantRequestDto.class));
-        doNothing().when(ownerHttpAdapter).getOwner(restaurantRequestDto.getIdOwner());
 
         mockMvc.perform(post("/restaurant")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -56,10 +52,9 @@ class RestaurantRestControllerTest {
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.message").value(Constants.RESTAURANT_CREATED_MESSAGE));
-
-        verify(ownerHttpAdapter).getOwner(restaurantRequestDto.getIdOwner());
     }
 
+    @Test
     void getRestaurants() throws Exception{
         RestaurantResponseDto restaurantResponseDto = new RestaurantResponseDto(1L,"testName", "string", 4, "+439094230412", "string", 123);
         List<RestaurantResponseDto> restaurantRequestDtoList = new ArrayList<>();
@@ -67,12 +62,16 @@ class RestaurantRestControllerTest {
         when(restaurantHandler.getRestaurants()).thenReturn(restaurantRequestDtoList);
 
         restaurantRestController.getRestaurants();
-        mockMvc.perform(get("/restaurants"))
+        mockMvc.perform(get("/restaurant/restaurants"))
                 .andDo(print())
-                        .andExpect(status().isOk())
-                                .andExpect(jsonPath("$").isArray())
-                                        .andExpect(jsonPath("$[0]").value(restaurantResponseDto));
-
-        verify(restaurantHandler,times(1)).getRestaurants();
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0]id").value(restaurantResponseDto.getId()))
+                .andExpect(jsonPath("$[0]name").value(restaurantResponseDto.getName()))
+                .andExpect(jsonPath("$[0]address").value(restaurantResponseDto.getAddress()))
+                .andExpect(jsonPath("$[0]idOwner").value(restaurantResponseDto.getIdOwner()))
+                .andExpect(jsonPath("$[0]phone").value(restaurantResponseDto.getPhone()))
+                .andExpect(jsonPath("$[0]urlLogo").value(restaurantResponseDto.getUrlLogo()))
+                .andExpect(jsonPath("$[0]nit").value(restaurantResponseDto.getNit()));
     }
 }

@@ -6,7 +6,6 @@ import com.pragma.powerup.usermicroservice.adapters.driving.http.exceptions.User
 import com.pragma.powerup.usermicroservice.domain.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -34,12 +33,6 @@ public class ControllerAdvisor {
             }
         }
         return new ResponseEntity<>(errorMessages, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<Map<String, String>> handleAuthenticationException(AuthenticationException noDataFoundException) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, WRONG_CREDENTIALS_MESSAGE));
     }
 
     @ExceptionHandler(NoDataFoundException.class)
@@ -135,5 +128,17 @@ public class ControllerAdvisor {
     public ResponseEntity<Map<String, String>>errorExcecutionException(ErrorExecutionException errorExcecutionException){
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, RESPONSE_ERROR_EXECUTION));
+    }
+
+    @ExceptionHandler(RoleNotAllowedForThisActionException.class)
+    public ResponseEntity<Map<String, String>>roleNotAllowedForThisActionException(RoleNotAllowedForThisActionException roleNotAllowedForThisActionException){
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, ROLE_NOT_ALLOWED_FOR_ACTION_MESSAGE));
+    }
+
+    @ExceptionHandler(NotOwnerTheRestaurantException.class)
+    public ResponseEntity<Map<String, String>>notOwnerTheRestaurantException(NotOwnerTheRestaurantException notOwnerTheRestaurantException){
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, NOT_OWNER_THE_RESTAURANT_MESSAGE));
     }
 }

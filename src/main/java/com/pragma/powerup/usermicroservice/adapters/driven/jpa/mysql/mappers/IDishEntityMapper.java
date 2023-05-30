@@ -13,4 +13,8 @@ public interface IDishEntityMapper {
     @Mapping(target = "restaurantEntity.id",source = "restaurant.id")
     @Mapping(target = "categoryEntity.id",source = "category.id")
     DishEntity toDishEntity(Dish dish);
+
+    @Mapping(target = "restaurant.id",source = "restaurantEntity.id")
+    @Mapping(target = "category.id",source = "categoryEntity.id")
+    Dish toDish(DishEntity dishEntity);
 }
