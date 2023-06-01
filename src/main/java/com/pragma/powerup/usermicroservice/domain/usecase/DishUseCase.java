@@ -26,6 +26,7 @@ public class DishUseCase implements IDishServicePort {
 
     public void saveDish(Dish dish) {
         validator.hasRoleValid(authUser.getRole(), Constants.OWNER_ROLE_NAME);
+
         dishValidator.allFieldsFilled(dish);
         validator.isValidUrl(dish.getUrlImage());
         dish.setActive(true);
@@ -37,6 +38,7 @@ public class DishUseCase implements IDishServicePort {
     @Override
     public void updateDish(Integer idDish, String description, Integer price) {
         validator.hasRoleValid(authUser.getRole(), Constants.OWNER_ROLE_NAME);
+
         validator.isStringFilled(description);
         validator.isIdValid(idDish);
 
