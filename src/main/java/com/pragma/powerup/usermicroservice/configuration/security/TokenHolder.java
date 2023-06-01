@@ -5,10 +5,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TokenHolder implements IPrincipalUser {
-    public Long idUser;
-    public String token;
-    public String role;
-    public String user;
+    public static Long idUser;
+    public static String token;
+    public static String role;
+    public static String user;
 
     @Override
     public Long getIdUser() {
