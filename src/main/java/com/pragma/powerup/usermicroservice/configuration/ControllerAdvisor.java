@@ -141,4 +141,16 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, NOT_OWNER_THE_RESTAURANT_MESSAGE));
     }
+
+    @ExceptionHandler(EmployeeAlreadyAssignedException.class)
+    public ResponseEntity<Map<String, String>>employeeAlreadyAssignedException(EmployeeAlreadyAssignedException employeeAlreadyAssignedException){
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, EMPLOYEE_ALREADY_ASSIGNED_WITH_A_RESTAURANT_MESSAGE));
+    }
+
+    @ExceptionHandler(InvalidFormatDateException.class)
+    public ResponseEntity<Map<String, String>>invalidFormatDateException(InvalidFormatDateException invalidFormatDateException){
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, INVALID_FORMAT_DATE_MESSAGE));
+    }
 }

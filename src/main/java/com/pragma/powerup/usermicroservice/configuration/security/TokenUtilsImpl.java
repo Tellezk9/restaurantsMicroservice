@@ -3,9 +3,7 @@ package com.pragma.powerup.usermicroservice.configuration.security;
 public class TokenUtilsImpl {
     public boolean validateRolePaths(String role, String path) {
         String[] adminPath = {"/restaurant"};
-        String[] ownerPath = {"/dish"};
-        String[] employeePath = {""};
-        String[] clientPath = {""};
+        String[] ownerPath = {"/dish","/restaurant/getRestaurants","/restaurant","/employee"};
         boolean result = false;
 
         switch (role) {

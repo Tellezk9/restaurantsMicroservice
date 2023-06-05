@@ -13,4 +13,5 @@ import java.util.List;
         unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface IRestaurantResponseMapper {
     List<RestaurantResponseDto> toListRestaurantResponseDto(List<Restaurant> restaurant);
+    RestaurantResponseDto toRestaurantResponseDto(Restaurant restaurant);
 }
