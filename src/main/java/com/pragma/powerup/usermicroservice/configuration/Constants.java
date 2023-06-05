@@ -39,6 +39,7 @@ public class Constants {
     public static final String INVALID_FORMAT_URL_MESSAGE = "The url is not valid";
     public static final String INVALID_PRICE_MESSAGE = "The price must be greater than zero (0)";
     public static final String USER_NOT_FOUND_MESSAGE = "No user found with the role provided";
+    public static final String DISH_NOT_FOUND_MESSAGE = "No dish found with the idDish or you are not the owner";
     public static final String USER_NOT_FOUND_WITH_ROLE_MESSAGE = "No user found with the role";
     public static final String NOT_OWNER_THE_RESTAURANT_MESSAGE = "You are not the owner of this restaurant.";
     public static final String SWAGGER_TITLE_MESSAGE = "User API Pragma Power Up";

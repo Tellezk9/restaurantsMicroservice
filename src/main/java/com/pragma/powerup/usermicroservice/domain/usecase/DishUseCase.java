@@ -35,7 +35,6 @@ public class DishUseCase implements IDishServicePort {
         dishPersistencePort.saveDish(dish);
     }
 
-    @Override
     public void updateDish(Integer idDish, String description, Integer price) {
         validator.hasRoleValid(authUser.getRole(), Constants.OWNER_ROLE_NAME);
 
@@ -48,5 +47,16 @@ public class DishUseCase implements IDishServicePort {
         dishValidator.isValidPrice(price);
 
         dishPersistencePort.updateDish(id, description, price);
+    }
+
+    public void changeDishState(Integer idDish, Boolean state) {
+        validator.hasRoleValid(authUser.getRole(), Constants.OWNER_ROLE_NAME);
+        validator.isIdValid(idDish);
+
+        Dish dish = dishPersistencePort.getDishById(Long.valueOf(idDish));
+
+        restaurantPersistencePort.getRestaurantByIdOwnerAndIdRestaurant(authUser.getIdUser(),dish.getRestaurant().getId());
+
+        dishPersistencePort.changeDishState(Long.valueOf(idDish), state);
     }
 }

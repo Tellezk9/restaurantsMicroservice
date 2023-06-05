@@ -48,4 +48,16 @@ class DishHandlerImplTest {
 
         verify(dishServicePort,times(1)).updateDish(1,"test",5000);
     }
+
+    @Test
+    void changeDishState() {
+        Integer idDish = 1;
+        Boolean state = true;
+
+        doNothing().when(dishServicePort).changeDishState(idDish,state);
+
+        dishServicePort.changeDishState(idDish,state);
+
+        verify(dishServicePort,times(1)).changeDishState(idDish,state);
+    }
 }

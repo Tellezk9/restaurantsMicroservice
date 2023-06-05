@@ -5,4 +5,5 @@ import com.pragma.powerup.usermicroservice.adapters.driving.http.dto.request.Dis
 public interface IDishHandler {
     void saveDish(DishRequestDto dishRequestDto);
     void updateDish(Integer idDish, String description,Integer price);
+    void changeDishState(Integer idDish, Boolean state);
 }

@@ -24,5 +24,10 @@ public class DishHandlerImpl implements IDishHandler {
         dishServicePort.updateDish(idDish, description, price);
     }
 
+    @Override
+    public void changeDishState(Integer idDish, Boolean state) {
+        dishServicePort.changeDishState(idDish, state);
+    }
+
 
 }

@@ -1,7 +1,7 @@
 package com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.adapter;
 
 import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.entity.DishEntity;
-import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.exceptions.NoDataFoundException;
+import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.exceptions.DishNotFoundException;
 import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.mappers.IDishEntityMapper;
 import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.repositories.IDishRepository;
 import com.pragma.powerup.usermicroservice.domain.model.Dish;
@@ -24,7 +24,7 @@ public class DishMysqlAdapter implements IDishPersistencePort {
     public void updateDish(Long idDish, String description, Integer price) {
         Optional<DishEntity> optionalDishEntity = dishRepository.findById(idDish);
         if (optionalDishEntity.isEmpty()) {
-            throw new NoDataFoundException();
+            throw new DishNotFoundException();
         }
         DishEntity dishEntity = optionalDishEntity.get();
         dishEntity.setDescription(description);
@@ -36,8 +36,19 @@ public class DishMysqlAdapter implements IDishPersistencePort {
     public Dish getDishById(Long id) {
         Optional<DishEntity> dishEntity = dishRepository.findById(id);
         if (!dishEntity.isPresent()) {
-            throw new NoDataFoundException();
+            throw new DishNotFoundException();
         }
         return dishEntityMapper.toDish(dishEntity.get());
+    }
+
+    @Override
+    public void changeDishState(Long idDish, Boolean state) {
+        Optional<DishEntity> optionalDishEntity = dishRepository.findById(idDish);
+        if (!optionalDishEntity.isPresent()) {
+            throw new DishNotFoundException();
+        }
+        DishEntity dishEntity = optionalDishEntity.get();
+        dishEntity.setActive(state);
+        dishRepository.save(dishEntity);
     }
 }

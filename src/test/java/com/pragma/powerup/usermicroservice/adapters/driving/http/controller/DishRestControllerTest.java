@@ -62,4 +62,16 @@ class DishRestControllerTest {
                 .andExpect(jsonPath("$.message").value(Constants.DISH_UPDATED_MESSAGE));
 
     }
+    @Test
+    void changeDishState() throws Exception {
+        doNothing().when(dishHandler).changeDishState(1, true);
+
+        mockMvc.perform(put("/dish/changeStateDish")
+                        .param("idDish","1")
+                        .param("state","true"))
+                .andDo(print())
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.message").value(Constants.DISH_UPDATED_MESSAGE));
+
+    }
 }
