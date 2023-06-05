@@ -17,6 +17,7 @@ public class Constants {
 
     public static final String RESPONSE_MESSAGE_KEY = "message";
     public static final String RESTAURANT_CREATED_MESSAGE = "Restaurant created successfully";
+    public static final String RESTAURANT_EMPLOYEE_CREATED_MESSAGE = "Restaurant employee created successfully";
     public static final String DISH_CREATED_MESSAGE = "Dish created successfully";
     public static final String DISH_UPDATED_MESSAGE = "Dish updated successfully";
     public static final String RESPONSE_ERROR_MESSAGE_KEY = "error";
@@ -30,6 +31,8 @@ public class Constants {
     public static final String ROLE_NOT_FOUND_MESSAGE = "No role found with the id provided";
     public static final String ROLE_NOT_ALLOWED_MESSAGE = "No permission granted to create users with this role";
     public static final String USER_ALREADY_EXISTS_MESSAGE = "A user already exists with the role provided";
+    public static final String EMPLOYEE_ALREADY_ASSIGNED_WITH_A_RESTAURANT_MESSAGE = "Employee already assigned with a restaurant";
+    public static final String INVALID_FORMAT_DATE_MESSAGE = "Date must be in the format 'yyyy/MM/dd'";
     public static final String RESTAURANT_ALREADY_EXISTS_MESSAGE = "A restaurant already exists with the nit";
     public static final String INVALID_RESTAURANT_NAME_MESSAGE = "The name of the restaurant should not be just numbers";
     public static final String USER_IS_NOT_LEGAL_AGE = "The user is not legal age";

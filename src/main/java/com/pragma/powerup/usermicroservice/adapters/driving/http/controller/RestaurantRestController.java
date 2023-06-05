@@ -44,6 +44,7 @@ public class RestaurantRestController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.RESTAURANT_CREATED_MESSAGE));
     }
+
     @Operation(summary = "Get all the restaurants",
             responses = {
                     @ApiResponse(responseCode = "200", description = "All restaurants returned",
@@ -52,7 +53,30 @@ public class RestaurantRestController {
                     @ApiResponse(responseCode = "404", description = "No data found",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
     @GetMapping("/restaurants")
-    public ResponseEntity<List<RestaurantResponseDto>> getRestaurants(){
+    public ResponseEntity<List<RestaurantResponseDto>> getRestaurants() {
         return ResponseEntity.ok(restaurantHandler.getRestaurants());
+    }
+
+    @Operation(summary = "Get all the owner restaurants",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "All restaurants returned",
+                            content = @Content(mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = RestaurantResponseDto.class)))),
+                    @ApiResponse(responseCode = "404", description = "No data found",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
+    @GetMapping("/ownerRestaurants/{idOwner}")
+    public ResponseEntity<List<RestaurantResponseDto>> getOwnerRestaurants(@PathVariable Integer idOwner) {
+        return ResponseEntity.ok(restaurantHandler.getOwnerRestaurants(idOwner));
+    }
+    @Operation(summary = "Get restaurant",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "All restaurants returned",
+                            content = @Content(mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = RestaurantResponseDto.class)))),
+                    @ApiResponse(responseCode = "404", description = "No data found",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
+    @GetMapping("/getRestaurant")
+    public ResponseEntity<RestaurantResponseDto> getRestaurant(@RequestParam Integer idOwner, Integer idRestaurant) {
+        return ResponseEntity.ok(restaurantHandler.getRestaurant(idOwner, idRestaurant));
     }
 }
