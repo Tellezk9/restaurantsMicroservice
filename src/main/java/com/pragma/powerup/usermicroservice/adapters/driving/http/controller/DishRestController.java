@@ -53,4 +53,20 @@ public class DishRestController {
         dishHandler.updateDish(id, description, price);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.DISH_UPDATED_MESSAGE));
     }
+
+    @Operation(summary = "change dish state",
+            responses = {
+                    @ApiResponse(responseCode = "202", description = "Dish state updated",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Map"))),
+                    @ApiResponse(responseCode = "412", description = "Dish not exists",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error"))),
+                    @ApiResponse(responseCode = "409", description = "Not the owner",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error"))),
+                    @ApiResponse(responseCode = "403", description = "Role not allowed for update dish state",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
+    @PutMapping("/changeStateDish")
+    public ResponseEntity<Map<String,String>> changeDishState(@RequestParam Integer idDish , Boolean state){
+        dishHandler.changeDishState(idDish, state);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.DISH_UPDATED_MESSAGE));
+    }
 }

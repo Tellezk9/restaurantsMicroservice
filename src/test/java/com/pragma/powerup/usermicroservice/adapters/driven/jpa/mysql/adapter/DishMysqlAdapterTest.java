@@ -3,7 +3,7 @@ package com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.adapter;
 import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.entity.CategoryEntity;
 import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.entity.DishEntity;
 import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.entity.RestaurantEntity;
-import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.exceptions.NoDataFoundException;
+import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.exceptions.DishNotFoundException;
 import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.mappers.IDishEntityMapper;
 import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.repositories.IDishRepository;
 import com.pragma.powerup.usermicroservice.domain.model.Category;
@@ -17,7 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -79,6 +78,30 @@ class DishMysqlAdapterTest {
     @DisplayName("Update dish with conflict")
     void updateDishConflict() {
         when(dishRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(NoDataFoundException.class,()->dishMysqlAdapter.updateDish(1L,"test",5000));
+        assertThrows(DishNotFoundException.class,()->dishMysqlAdapter.updateDish(1L,"test",5000));
+    }
+
+    @Test
+    void changeDishStateSuccess() {
+        Long idDish = 1L;
+        Boolean state = true;
+        DishEntity dishEntity = new DishEntity(1L, "testName", null, "descriptionTest", 100, null, "http://urlTest.com/test", true);
+        Optional<DishEntity> entityOptional= Optional.of(dishEntity);
+
+        when(dishRepository.findById(idDish)).thenReturn(entityOptional);
+
+        dishMysqlAdapter.changeDishState(idDish,state);
+
+        verify(dishRepository, times(1)).findById(idDish);
+        verify(dishRepository, times(1)).save(dishEntity);
+    }
+
+    @Test
+    @DisplayName("Update dish state with conflict")
+    void changeDishStateConflict() {
+        Long idDish = 1L;
+        Boolean state = true;
+        when(dishRepository.findById(idDish)).thenReturn(Optional.empty());
+        assertThrows(DishNotFoundException.class,()->dishMysqlAdapter.changeDishState(idDish,state));
     }
 }
