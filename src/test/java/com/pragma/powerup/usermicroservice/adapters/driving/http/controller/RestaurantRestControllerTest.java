@@ -2,7 +2,7 @@ package com.pragma.powerup.usermicroservice.adapters.driving.http.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pragma.powerup.usermicroservice.adapters.driving.http.dto.request.RestaurantRequestDto;
-import com.pragma.powerup.usermicroservice.adapters.driving.http.dto.response.GetRestaurantsResponseDto;
+import com.pragma.powerup.usermicroservice.adapters.driving.http.dto.response.RestaurantResponseDto;
 import com.pragma.powerup.usermicroservice.adapters.driving.http.handlers.IRestaurantHandler;
 import com.pragma.powerup.usermicroservice.configuration.Constants;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,22 +55,23 @@ class RestaurantRestControllerTest {
     }
 
     @Test
-    void getRestaurants() throws Exception {
-        Integer page = 2;
-        GetRestaurantsResponseDto getRestaurantsResponseDto = new GetRestaurantsResponseDto(1L, "testName", "string");
-        List<GetRestaurantsResponseDto> restaurantsList = new ArrayList<>();
-        restaurantsList.add(getRestaurantsResponseDto);
+    void getRestaurants() throws Exception{
+        RestaurantResponseDto restaurantResponseDto = new RestaurantResponseDto(1L,"testName", "string", 4, "+439094230412", "string", 123);
+        List<RestaurantResponseDto> restaurantRequestDtoList = new ArrayList<>();
+        restaurantRequestDtoList.add(restaurantResponseDto);
+        when(restaurantHandler.getRestaurants()).thenReturn(restaurantRequestDtoList);
 
-        when(restaurantHandler.getRestaurants(page)).thenReturn(restaurantsList);
-
-        restaurantRestController.getRestaurants(page);
-        mockMvc.perform(get("/restaurant/restaurants")
-                        .param("page", String.valueOf(page)))
+        restaurantRestController.getRestaurants();
+        mockMvc.perform(get("/restaurant/restaurants"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0]id").value(restaurantsList.get(0).getId()))
-                .andExpect(jsonPath("$[0]name").value(restaurantsList.get(0).getName()))
-                .andExpect(jsonPath("$[0]urlLogo").value(restaurantsList.get(0).getUrlLogo()));
+                .andExpect(jsonPath("$[0]id").value(restaurantResponseDto.getId()))
+                .andExpect(jsonPath("$[0]name").value(restaurantResponseDto.getName()))
+                .andExpect(jsonPath("$[0]address").value(restaurantResponseDto.getAddress()))
+                .andExpect(jsonPath("$[0]idOwner").value(restaurantResponseDto.getIdOwner()))
+                .andExpect(jsonPath("$[0]phone").value(restaurantResponseDto.getPhone()))
+                .andExpect(jsonPath("$[0]urlLogo").value(restaurantResponseDto.getUrlLogo()))
+                .andExpect(jsonPath("$[0]nit").value(restaurantResponseDto.getNit()));
     }
 }

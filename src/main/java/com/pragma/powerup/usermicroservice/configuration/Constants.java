@@ -14,7 +14,6 @@ public class Constants {
     public static final String EMPLOYEE_ROLE_NAME = "ROLE_EMPLOYEE";
     public static final String OWNER_ROLE_NAME = "ROLE_OWNER";
     public static final String ADMIN_ROLE_NAME = "ROLE_ADMIN";
-    public static final int MAX_PAGE_SIZE = 3;
 
     public static final String RESPONSE_MESSAGE_KEY = "message";
     public static final String RESTAURANT_CREATED_MESSAGE = "Restaurant created successfully";
@@ -36,7 +35,6 @@ public class Constants {
     public static final String INVALID_FORMAT_DATE_MESSAGE = "Date must be in the format 'yyyy/MM/dd'";
     public static final String RESTAURANT_ALREADY_EXISTS_MESSAGE = "A restaurant already exists with the nit";
     public static final String INVALID_RESTAURANT_NAME_MESSAGE = "The name of the restaurant should not be just numbers";
-    public static final String RESTAURANT_NOT_FOUND_MESSAGE = "No restaurant found";
     public static final String USER_IS_NOT_LEGAL_AGE = "The user is not legal age";
     public static final String INVALID_FORMAT_URL_MESSAGE = "The url is not valid";
     public static final String INVALID_PRICE_MESSAGE = "The price must be greater than zero (0)";

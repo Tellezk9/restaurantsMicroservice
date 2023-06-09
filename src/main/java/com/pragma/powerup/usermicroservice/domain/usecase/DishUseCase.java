@@ -4,7 +4,7 @@ import com.pragma.powerup.usermicroservice.configuration.Constants;
 import com.pragma.powerup.usermicroservice.domain.api.IDishServicePort;
 import com.pragma.powerup.usermicroservice.domain.auth.IPrincipalUser;
 import com.pragma.powerup.usermicroservice.domain.model.Dish;
-import com.pragma.powerup.usermicroservice.domain.service.DishService;
+import com.pragma.powerup.usermicroservice.domain.service.DishValidator;
 import com.pragma.powerup.usermicroservice.domain.service.Validator;
 import com.pragma.powerup.usermicroservice.domain.spi.IDishPersistencePort;
 import com.pragma.powerup.usermicroservice.domain.spi.IRestaurantPersistencePort;
@@ -13,12 +13,12 @@ public class DishUseCase implements IDishServicePort {
     private final IDishPersistencePort dishPersistencePort;
     private final IRestaurantPersistencePort restaurantPersistencePort;
     private final Validator validator;
-    private final DishService dishService;
+    private final DishValidator dishValidator;
     public final IPrincipalUser authUser;
 
     public DishUseCase(IDishPersistencePort dishPersistencePort, IPrincipalUser authUser, IRestaurantPersistencePort restaurantPersistencePort) {
         this.validator = new Validator();
-        this.dishService = new DishService();
+        this.dishValidator = new DishValidator();
         this.dishPersistencePort = dishPersistencePort;
         this.restaurantPersistencePort = restaurantPersistencePort;
         this.authUser = authUser;
@@ -27,7 +27,7 @@ public class DishUseCase implements IDishServicePort {
     public void saveDish(Dish dish) {
         validator.hasRoleValid(authUser.getRole(), Constants.OWNER_ROLE_NAME);
 
-        dishService.allFieldsFilled(dish);
+        dishValidator.allFieldsFilled(dish);
         validator.isValidUrl(dish.getUrlImage());
         dish.setActive(true);
 
@@ -43,8 +43,8 @@ public class DishUseCase implements IDishServicePort {
 
         Long id = Long.valueOf(idDish);
         Dish dish = dishPersistencePort.getDishById(id);
-        dishService.isTheRestaurantOwner(dish.getRestaurant().getIdOwner(), authUser.getIdUser());
-        dishService.isValidPrice(price);
+        dishValidator.isTheRestaurantOwner(dish.getRestaurant().getIdOwner(), authUser.getIdUser());
+        dishValidator.isValidPrice(price);
 
         dishPersistencePort.updateDish(id, description, price);
     }
