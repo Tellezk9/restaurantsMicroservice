@@ -1,10 +1,12 @@
 package com.pragma.powerup.usermicroservice.adapters.driving.http.controller;
 
 import com.pragma.powerup.usermicroservice.adapters.driving.http.dto.request.RestaurantRequestDto;
+import com.pragma.powerup.usermicroservice.adapters.driving.http.dto.response.GetRestaurantsResponseDto;
 import com.pragma.powerup.usermicroservice.adapters.driving.http.dto.response.RestaurantResponseDto;
 import com.pragma.powerup.usermicroservice.adapters.driving.http.handlers.IRestaurantHandler;
 import com.pragma.powerup.usermicroservice.configuration.Constants;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -53,8 +55,8 @@ public class RestaurantRestController {
                     @ApiResponse(responseCode = "404", description = "No data found",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
     @GetMapping("/restaurants")
-    public ResponseEntity<List<RestaurantResponseDto>> getRestaurants() {
-        return ResponseEntity.ok(restaurantHandler.getRestaurants());
+    public ResponseEntity<List<GetRestaurantsResponseDto>> getRestaurants(@Parameter(description = "Number of the page to list restaurants") @RequestParam Integer page) {
+        return ResponseEntity.ok(restaurantHandler.getRestaurants(page));
     }
 
     @Operation(summary = "Get all the owner restaurants",

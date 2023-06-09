@@ -1,7 +1,7 @@
 package com.pragma.powerup.usermicroservice.adapters.driving.http.handlers.impl;
 
 import com.pragma.powerup.usermicroservice.adapters.driving.http.dto.request.RestaurantRequestDto;
-import com.pragma.powerup.usermicroservice.adapters.driving.http.dto.response.RestaurantResponseDto;
+import com.pragma.powerup.usermicroservice.adapters.driving.http.dto.response.GetRestaurantsResponseDto;
 import com.pragma.powerup.usermicroservice.adapters.driving.http.mapper.IRestaurantRequestMapper;
 import com.pragma.powerup.usermicroservice.adapters.driving.http.mapper.IRestaurantResponseMapper;
 import com.pragma.powerup.usermicroservice.domain.api.IRestaurantServicePort;
@@ -45,20 +45,21 @@ class RestaurantHandlerImplTest {
 
     @Test
     void getRestaurants() {
-        List<RestaurantResponseDto> restaurantResponseDto = Arrays.asList(
-                new RestaurantResponseDto(1L, "testName", "address", 1, "+12345678912", "http", 123)
+        Integer page = 2;
+        List<GetRestaurantsResponseDto> getRestaurantsResponseDto = List.of(
+                new GetRestaurantsResponseDto(1L, "urlLogo", "testName")
         );
 
-        List<Restaurant> restaurant = Arrays.asList(
+        List<Restaurant> restaurant = List.of(
                 new Restaurant(1L, "name", "address", 1L, "123", "urlLogo", 123)
         );
 
-        when(restaurantServicePort.getRestaurants()).thenReturn(restaurant);
-        when(restaurantResponseMapper.toListRestaurantResponseDto(restaurant)).thenReturn(restaurantResponseDto);
+        when(restaurantServicePort.getRestaurants(page)).thenReturn(restaurant);
+        when(restaurantResponseMapper.toGetRestaurantResponse(restaurant)).thenReturn(getRestaurantsResponseDto);
 
-        restaurantHandler.getRestaurants();
+        restaurantHandler.getRestaurants(page);
 
-        verify(restaurantServicePort,times(1)).getRestaurants();
-        verify(restaurantResponseMapper,times(1)).toListRestaurantResponseDto(restaurant);
+        verify(restaurantServicePort,times(1)).getRestaurants(page);
+        verify(restaurantResponseMapper,times(1)).toGetRestaurantResponse(restaurant);
     }
 }
