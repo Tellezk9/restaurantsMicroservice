@@ -5,13 +5,17 @@ import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.exceptions.
 import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.exceptions.RestaurantAlreadyExistsException;
 import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.mappers.IRestaurantEntityMapper;
 import com.pragma.powerup.usermicroservice.adapters.driven.jpa.mysql.repositories.IRestaurantRepository;
+import com.pragma.powerup.usermicroservice.configuration.Constants;
 import com.pragma.powerup.usermicroservice.domain.model.Restaurant;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -54,29 +58,30 @@ class RestaurantMysqlAdapterTest {
 
     @Test
     void getRestaurants() {
-        List<Restaurant> restaurantList = Arrays.asList(
-                new Restaurant(1L, "testName1", "string", 4L, "+439094230412", "string", 123)
-        );
-        List<RestaurantEntity> restaurantEntities = Arrays.asList(
-                new RestaurantEntity(1L, "testName", "string", 4L, "+439094230412", "string", "123")
-        );
+        Integer page = 2;
+        String[] restaurant1 = {"1", "testName", "testUrl"};
+        String[] restaurant2 = {"2", "testName2", "testUrl2"};
+        List<String[]> restaurantList = new ArrayList<>();
+        restaurantList.add(restaurant1);
+        restaurantList.add(restaurant2);
+        Pageable pageable = PageRequest.of(page,Constants.MAX_PAGE_SIZE);
 
-        when(restaurantRepository.findAll()).thenReturn(restaurantEntities);
-        when(restaurantEntityMapper.toRestaurantList(restaurantEntities)).thenReturn(restaurantList);
+        when(restaurantRepository.getNameAndUrl(pageable)).thenReturn(restaurantList);
 
-        restaurantMysqlAdapter.getRestaurants();
+        restaurantMysqlAdapter.getRestaurants(page);
 
-        verify(restaurantRepository, times(1)).findAll();
-        verify(restaurantEntityMapper, times(1)).toRestaurantList(restaurantEntities);
+        verify(restaurantRepository, times(1)).getNameAndUrl(pageable);
     }
 
     @Test
     void getRestaurantsConflict() {
-        List<RestaurantEntity> restaurantEntities = Arrays.asList();
+        Integer page = 2;
+        Pageable pageable = PageRequest.of(page,Constants.MAX_PAGE_SIZE);
+        List<String[]> restaurantEntities = Arrays.asList();
 
-        when(restaurantRepository.findAll()).thenReturn(restaurantEntities);
+        when(restaurantRepository.getNameAndUrl(pageable)).thenReturn(restaurantEntities);
 
-        assertThrows(NoDataFoundException.class, () -> restaurantMysqlAdapter.getRestaurants());
-        verify(restaurantRepository, times(1)).findAll();
+        assertThrows(NoDataFoundException.class, () -> restaurantMysqlAdapter.getRestaurants(page));
+        verify(restaurantRepository, times(1)).getNameAndUrl(pageable);
     }
 }

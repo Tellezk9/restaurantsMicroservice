@@ -1,6 +1,7 @@
 package com.pragma.powerup.usermicroservice.adapters.driving.http.handlers.impl;
 
 import com.pragma.powerup.usermicroservice.adapters.driving.http.dto.request.RestaurantRequestDto;
+import com.pragma.powerup.usermicroservice.adapters.driving.http.dto.response.GetRestaurantsResponseDto;
 import com.pragma.powerup.usermicroservice.adapters.driving.http.dto.response.RestaurantResponseDto;
 import com.pragma.powerup.usermicroservice.adapters.driving.http.handlers.IRestaurantHandler;
 import com.pragma.powerup.usermicroservice.adapters.driving.http.mapper.IRestaurantRequestMapper;
@@ -29,8 +30,8 @@ public class RestaurantHandlerImpl implements IRestaurantHandler {
     }
 
     @Override
-    public List<RestaurantResponseDto> getRestaurants() {
-        return restaurantResponseMapper.toListRestaurantResponseDto(restaurantServicePort.getRestaurants());
+    public List<GetRestaurantsResponseDto> getRestaurants(Integer page) {
+        return restaurantResponseMapper.toGetRestaurantResponse(restaurantServicePort.getRestaurants(page));
     }
 
     @Override
