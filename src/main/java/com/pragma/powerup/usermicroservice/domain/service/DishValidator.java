@@ -5,7 +5,7 @@ import com.pragma.powerup.usermicroservice.domain.exceptions.InvalidPriceExcepti
 import com.pragma.powerup.usermicroservice.domain.exceptions.NotOwnerTheRestaurantException;
 import com.pragma.powerup.usermicroservice.domain.model.Dish;
 
-public class DishService {
+public class DishValidator {
     public boolean allFieldsFilled(Dish dish) {
         if (
                 (dish.getName() == null || dish.getName().isEmpty()) ||

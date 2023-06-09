@@ -1,6 +1,5 @@
 package com.pragma.powerup.usermicroservice.adapters.driving.http.mapper;
 
-import com.pragma.powerup.usermicroservice.adapters.driving.http.dto.response.GetRestaurantsResponseDto;
 import com.pragma.powerup.usermicroservice.adapters.driving.http.dto.response.RestaurantResponseDto;
 import com.pragma.powerup.usermicroservice.domain.model.Restaurant;
 import org.mapstruct.Mapper;
@@ -15,5 +14,4 @@ import java.util.List;
 public interface IRestaurantResponseMapper {
     List<RestaurantResponseDto> toListRestaurantResponseDto(List<Restaurant> restaurant);
     RestaurantResponseDto toRestaurantResponseDto(Restaurant restaurant);
-    List<GetRestaurantsResponseDto> toGetRestaurantResponse(List<Restaurant> restaurants);
 }

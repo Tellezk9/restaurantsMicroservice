@@ -9,13 +9,9 @@ import com.pragma.powerup.usermicroservice.domain.exceptions.NotOwnerTheRestaura
 import com.pragma.powerup.usermicroservice.domain.model.Restaurant;
 import com.pragma.powerup.usermicroservice.domain.spi.IRestaurantPersistencePort;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
-
-import static com.pragma.powerup.usermicroservice.configuration.Constants.MAX_PAGE_SIZE;
 
 @AllArgsConstructor
 public class RestaurantMysqlAdapter implements IRestaurantPersistencePort {
@@ -41,13 +37,12 @@ public class RestaurantMysqlAdapter implements IRestaurantPersistencePort {
     }
 
     @Override
-    public List<String[]> getRestaurants(Integer page) {
-        Pageable pagination = PageRequest.of(page, MAX_PAGE_SIZE);
-        List<String[]> restaurantEntities = restaurantRepository.getNameAndUrl(pagination);
+    public List<Restaurant> getRestaurants() {
+        List<RestaurantEntity> restaurantEntities = restaurantRepository.findAll();
         if (restaurantEntities.isEmpty()){
             throw new NoDataFoundException();
         }
-        return restaurantEntities;
+        return restaurantEntityMapper.toRestaurantList(restaurantEntities);
     }
 
     @Override

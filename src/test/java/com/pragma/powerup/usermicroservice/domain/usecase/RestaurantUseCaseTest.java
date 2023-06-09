@@ -5,7 +5,7 @@ import com.pragma.powerup.usermicroservice.domain.auth.IPrincipalUser;
 import com.pragma.powerup.usermicroservice.domain.geteway.IHttpAdapter;
 import com.pragma.powerup.usermicroservice.domain.model.Employee;
 import com.pragma.powerup.usermicroservice.domain.model.Restaurant;
-import com.pragma.powerup.usermicroservice.domain.service.RestaurantService;
+import com.pragma.powerup.usermicroservice.domain.service.Validator;
 import com.pragma.powerup.usermicroservice.domain.spi.IEmployeePersistencePort;
 import com.pragma.powerup.usermicroservice.domain.spi.IRestaurantPersistencePort;
 import org.junit.jupiter.api.Test;
@@ -52,18 +52,15 @@ class RestaurantUseCaseTest {
 
     @Test
     void getRestaurants() {
-        Integer page = 2;
-        List<String[]> restaurantsStringList = new ArrayList<>();
-        String[] restaurant1 = {"1","testName","testUrl"};
-        String[] restaurant2 = {"2","testName2","testUrl2"};
-        restaurantsStringList.add(restaurant1);
-        restaurantsStringList.add(restaurant2);
+        Restaurant restaurant = new Restaurant(1L, "testNam2e", "string", 4L, "+439094230412", "http://www.test.com/", 123);
+        List<Restaurant> restaurantsList = new ArrayList<>();
+        restaurantsList.add(restaurant);
 
-        when(restaurantPersistencePort.getRestaurants(page)).thenReturn(restaurantsStringList);
+        when(authUser.getRole()).thenReturn("ROLE_OWNER");
+        when(restaurantPersistencePort.getRestaurants()).thenReturn(restaurantsList);
 
-        restaurantUseCase.getRestaurants(page);
-
-        verify(restaurantPersistencePort, times(1)).getRestaurants(page);
+        restaurantUseCase.getRestaurants();
+        verify(restaurantPersistencePort, times(1)).getRestaurants();
     }
 
     @Test
