@@ -159,4 +159,13 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, DISH_NOT_FOUND_MESSAGE));
     }
+    @ExceptionHandler(NoRestaurantFoundException.class)
+    public ResponseEntity<Map<String, String>> noRestaurantFoundException(
+            NoRestaurantFoundException noRestaurantFoundException) {
+        return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, RESTAURANT_NOT_FOUND_MESSAGE));
+    }
+
+
+
 }
