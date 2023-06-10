@@ -47,7 +47,7 @@ public class RestaurantRestController {
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.RESTAURANT_CREATED_MESSAGE));
     }
 
-    @Operation(summary = "Get all the restaurants ",
+    @Operation(summary = "Get all the restaurants",
             responses = {
                     @ApiResponse(responseCode = "200", description = "All restaurants returned",
                             content = @Content(mediaType = "application/json",
