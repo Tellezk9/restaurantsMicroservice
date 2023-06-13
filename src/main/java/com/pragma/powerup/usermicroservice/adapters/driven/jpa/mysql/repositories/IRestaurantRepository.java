@@ -15,6 +15,6 @@ public interface IRestaurantRepository extends JpaRepository<RestaurantEntity, L
 
     List<RestaurantEntity> findByIdOwner(Long idOwner);
 
-    @Query("SELECT id,name,urlLogo FROM RestaurantEntity r")
+    @Query("SELECT id,name,urlLogo FROM RestaurantEntity r order by name asc")
     List<String[]> getNameAndUrl(Pageable pageable);
 }
