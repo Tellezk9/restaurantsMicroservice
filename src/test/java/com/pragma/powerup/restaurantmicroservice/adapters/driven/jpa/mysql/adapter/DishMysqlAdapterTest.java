@@ -119,11 +119,11 @@ class DishMysqlAdapterTest {
         List<DishEntity> dishEntities = new ArrayList<>();
         dishEntities.add(dishEntity);
 
-        when(dishRepository.findByRestaurantEntityId(idRestaurant, pageable)).thenReturn(dishEntities);
+        when(dishRepository.findByRestaurantEntityIdAndActive(idRestaurant, true, pageable)).thenReturn(dishEntities);
 
         dishMysqlAdapter.getDishesByRestaurantId(idRestaurant, page);
 
-        verify(dishRepository, times(1)).findByRestaurantEntityId(idRestaurant, pageable);
+        verify(dishRepository, times(1)).findByRestaurantEntityIdAndActive(idRestaurant, true, pageable);
     }
 
     @Test
@@ -133,10 +133,10 @@ class DishMysqlAdapterTest {
         Pageable pageable = PageRequest.of(page, Constants.MAX_PAGE_SIZE);
         List<DishEntity> dishEntities = new ArrayList<>();
 
-        when(dishRepository.findByRestaurantEntityId(idRestaurant, pageable)).thenReturn(dishEntities);
+        when(dishRepository.findByRestaurantEntityIdAndActive(idRestaurant, true, pageable)).thenReturn(dishEntities);
 
         assertThrows(DishNotFoundException.class, () -> dishMysqlAdapter.getDishesByRestaurantId(idRestaurant, page));
-        verify(dishRepository, times(1)).findByRestaurantEntityId(idRestaurant, pageable);
+        verify(dishRepository, times(1)).findByRestaurantEntityIdAndActive(idRestaurant, true, pageable);
     }
 
 
@@ -150,11 +150,11 @@ class DishMysqlAdapterTest {
         List<DishEntity> dishEntities = new ArrayList<>();
         dishEntities.add(dishEntity);
 
-        when(dishRepository.findByRestaurantEntityIdAndCategoryEntityId(idRestaurant, idCategory, pageable)).thenReturn(dishEntities);
+        when(dishRepository.findByRestaurantEntityIdAndCategoryEntityIdAndActive(idRestaurant, idCategory, true, pageable)).thenReturn(dishEntities);
 
         dishMysqlAdapter.getDishesByRestaurantIdAndCategoryId(idRestaurant, idCategory, page);
 
-        verify(dishRepository, times(1)).findByRestaurantEntityIdAndCategoryEntityId(idRestaurant, idCategory, pageable);
+        verify(dishRepository, times(1)).findByRestaurantEntityIdAndCategoryEntityIdAndActive(idRestaurant, idCategory, true, pageable);
     }
 
     @Test
@@ -165,9 +165,9 @@ class DishMysqlAdapterTest {
         Pageable pageable = PageRequest.of(page, Constants.MAX_PAGE_SIZE);
         List<DishEntity> dishEntities = new ArrayList<>();
 
-        when(dishRepository.findByRestaurantEntityIdAndCategoryEntityId(idRestaurant, idCategory, pageable)).thenReturn(dishEntities);
+        when(dishRepository.findByRestaurantEntityIdAndCategoryEntityIdAndActive(idRestaurant, idCategory, true, pageable)).thenReturn(dishEntities);
 
         assertThrows(DishNotFoundException.class, () -> dishMysqlAdapter.getDishesByRestaurantIdAndCategoryId(idRestaurant, idCategory, page));
-        verify(dishRepository, times(1)).findByRestaurantEntityIdAndCategoryEntityId(idRestaurant,idCategory, pageable);
+        verify(dishRepository, times(1)).findByRestaurantEntityIdAndCategoryEntityIdAndActive(idRestaurant, idCategory, true, pageable);
     }
 }

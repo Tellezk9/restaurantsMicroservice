@@ -59,7 +59,7 @@ public class DishMysqlAdapter implements IDishPersistencePort {
     @Override
     public List<Dish> getDishesByRestaurantId(Long idRestaurant, Integer page) {
         Pageable pagination = PageRequest.of(page, MAX_PAGE_SIZE);
-        List<DishEntity> dishEntities = dishRepository.findByRestaurantEntityId(idRestaurant, pagination);
+        List<DishEntity> dishEntities = dishRepository.findByRestaurantEntityIdAndActive(idRestaurant,true, pagination);
         if (dishEntities.isEmpty()) {
             throw new DishNotFoundException();
         }
@@ -68,7 +68,7 @@ public class DishMysqlAdapter implements IDishPersistencePort {
 
     public List<Dish> getDishesByRestaurantIdAndCategoryId(Long idRestaurant, Long idCategory, Integer page) {
         Pageable pagination = PageRequest.of(page, MAX_PAGE_SIZE);
-        List<DishEntity> dishEntities = dishRepository.findByRestaurantEntityIdAndCategoryEntityId(idRestaurant, idCategory, pagination);
+        List<DishEntity> dishEntities = dishRepository.findByRestaurantEntityIdAndCategoryEntityIdAndActive(idRestaurant, idCategory,true, pagination);
         if (dishEntities.isEmpty()) {
             throw new DishNotFoundException();
         }
