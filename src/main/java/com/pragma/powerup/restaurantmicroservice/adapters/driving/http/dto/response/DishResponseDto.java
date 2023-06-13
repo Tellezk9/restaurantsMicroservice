@@ -1,0 +1,16 @@
+package com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response;
+
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@AllArgsConstructor
+@Getter
+public class DishResponseDto {
+    private Integer id;
+    private String name;
+    private Integer price;
+    private String description;
+    private String urlImage;
+    private Integer idCategory;
+}
