@@ -146,7 +146,7 @@ class DishMysqlAdapterTest {
         Long idCategory = 1L;
         int page = 2;
         Pageable pageable = PageRequest.of(page, Constants.MAX_PAGE_SIZE);
-        DishEntity dishEntity = new DishEntity(1L, "test ", null, "testDescription", 12345, null, "url", true);
+        DishEntity dishEntity = new DishEntity(1L, "test", null, "testDescription", 12345, null, "url", true);
         List<DishEntity> dishEntities = new ArrayList<>();
         dishEntities.add(dishEntity);
 
