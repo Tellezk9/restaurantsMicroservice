@@ -96,11 +96,11 @@ class DishUseCaseTest {
         List<Dish> dishList = new ArrayList<>();
         dishList.add(dish);
 
-        when(dishPersistencePort.getDishesByRestaurantId(idRestaurant, page)).thenReturn(dishList);
+        when(dishPersistencePort.getDishesByRestaurantIdPageable(idRestaurant, page)).thenReturn(dishList);
 
         dishUseCase.getDishes(Integer.valueOf(String.valueOf(idRestaurant)), Integer.valueOf(String.valueOf(idCategory)), page);
 
-        verify(dishPersistencePort, times(1)).getDishesByRestaurantId(idRestaurant, page);
+        verify(dishPersistencePort, times(1)).getDishesByRestaurantIdPageable(idRestaurant, page);
     }
 
     @Test
@@ -115,10 +115,10 @@ class DishUseCaseTest {
         List<Dish> dishList = new ArrayList<>();
         dishList.add(dish);
 
-        when(dishPersistencePort.getDishesByRestaurantIdAndCategoryId(idRestaurant,idCategory, page)).thenReturn(dishList);
+        when(dishPersistencePort.getDishesByRestaurantIdAndCategoryIdPageable(idRestaurant, idCategory, page)).thenReturn(dishList);
 
         dishUseCase.getDishes(Integer.valueOf(String.valueOf(idRestaurant)), Integer.valueOf(String.valueOf(idCategory)), page);
 
-        verify(dishPersistencePort, times(1)).getDishesByRestaurantIdAndCategoryId(idRestaurant,idCategory, page);
+        verify(dishPersistencePort, times(1)).getDishesByRestaurantIdAndCategoryIdPageable(idRestaurant, idCategory, page);
     }
 }

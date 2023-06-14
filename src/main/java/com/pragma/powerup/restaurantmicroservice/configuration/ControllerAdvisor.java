@@ -165,7 +165,43 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, RESTAURANT_NOT_FOUND_MESSAGE));
     }
+    @ExceptionHandler(DishDoesNotBelongToTheRestaurantException.class)
+    public ResponseEntity<Map<String, String>> dishDoesNotBelongToTheRestaurantException(
+            DishDoesNotBelongToTheRestaurantException dishDoesNotBelongToTheRestaurantException) {
+        return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, DISH_DOES_NOT_BELONG_MESSAGE));
+    }
 
+    @ExceptionHandler(EmptyFieldFoundException.class)
+    public ResponseEntity<Map<String, String>> emptyFieldFoundException(
+            EmptyFieldFoundException emptyFieldFoundException) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, EMPTY_FIELD_FOUND_MESSAGE));
+    }
 
+    @ExceptionHandler(OrderAndAmountIsNotEqualsException.class)
+    public ResponseEntity<Map<String, String>> orderAndAmountIsNotEqualsException(
+            OrderAndAmountIsNotEqualsException orderAndAmountIsNotEqualsException) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, ORDER_AND_AMOUNT_IS_NOT_EQUALS_MESSAGE));
+    }
+    @ExceptionHandler(InvalidValueException.class)
+    public ResponseEntity<Map<String, String>> invalidValueException(
+            InvalidValueException invalidValueException) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, INVALID_VALUE_MESSAGE));
+    }
+    @ExceptionHandler(ClientHasPendingOrderException.class)
+    public ResponseEntity<Map<String, String>> clientHasPendingOrderException(
+            ClientHasPendingOrderException clientHasPendingOrderException) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, CLIENT_HAS_PENDING_ORDER_MESSAGE));
+    }
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<Map<String, String>> orderNotFoundException(
+            OrderNotFoundException orderNotFoundException) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, ORDER_NOT_FOUND_MESSAGE));
+    }
 
 }

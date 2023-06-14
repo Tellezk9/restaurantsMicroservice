@@ -1,23 +1,17 @@
 package com.pragma.powerup.restaurantmicroservice.configuration;
 
-import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.adapter.DishMysqlAdapter;
-import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.adapter.EmployeeMysqlAdapter;
-import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.adapter.RestaurantMysqlAdapter;
-import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.mappers.IDishEntityMapper;
-import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.mappers.IEmployeeEntityMapper;
-import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.mappers.IRestaurantEntityMapper;
-import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.repositories.IDishRepository;
-import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.repositories.IRestaurantRepository;
-import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.repositories.IEmployeeRepository;
+import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.adapter.*;
+import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.mappers.*;
+import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.repositories.*;
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.adapter.HttpAdapterImpl;
 import com.pragma.powerup.restaurantmicroservice.configuration.security.TokenHolder;
 import com.pragma.powerup.restaurantmicroservice.domain.api.IDishServicePort;
+import com.pragma.powerup.restaurantmicroservice.domain.api.IOrderServicePort;
 import com.pragma.powerup.restaurantmicroservice.domain.api.IRestaurantServicePort;
 import com.pragma.powerup.restaurantmicroservice.domain.geteway.IHttpAdapter;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.IDishPersistencePort;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.IEmployeePersistencePort;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.IRestaurantPersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.*;
 import com.pragma.powerup.restaurantmicroservice.domain.usecase.DishUseCase;
+import com.pragma.powerup.restaurantmicroservice.domain.usecase.OrderUseCase;
 import com.pragma.powerup.restaurantmicroservice.domain.usecase.RestaurantUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -34,6 +28,10 @@ public class BeanConfiguration {
     private final IDishRepository dishRepository;
     private final IEmployeeRepository employeeRepository;
     private final IEmployeeEntityMapper employeeEntityMapper;
+    private final IOrderRepository orderRepository;
+    private final IOrderEntityMapper orderEntityMapper;
+    private final IOrderDishRepository orderDishRepository;
+    private final IOrderDishEntityMapper orderDishEntityMapper;
     private final TokenHolder tokenHolder;
 
     @Bean
@@ -43,7 +41,7 @@ public class BeanConfiguration {
 
     @Bean
     public IRestaurantServicePort restaurantServicePort() {
-        return new RestaurantUseCase(restaurantPersistencePort(), employeePersistencePort(),tokenHolder, httpAdapter());
+        return new RestaurantUseCase(restaurantPersistencePort(), employeePersistencePort(), tokenHolder, httpAdapter());
     }
 
     @Bean
@@ -67,7 +65,22 @@ public class BeanConfiguration {
     }
 
     @Bean
-    public IHttpAdapter httpAdapter(){
+    public IHttpAdapter httpAdapter() {
         return new HttpAdapterImpl(restTemplate());
+    }
+
+    @Bean
+    public IOrderServicePort orderServicePort() {
+        return new OrderUseCase(orderPersistencePort(), dishPersistencePort(), orderDishPersistencePort(), tokenHolder);
+    }
+
+    @Bean
+    public IOrderPersistencePort orderPersistencePort() {
+        return new OrderMysqlAdapter(orderRepository, orderEntityMapper);
+    }
+
+    @Bean
+    public IOrderDishPersistencePort orderDishPersistencePort() {
+        return new OrderDishMysqlAdapter(orderDishRepository, orderDishEntityMapper);
     }
 }

@@ -66,8 +66,8 @@ public class DishUseCase implements IDishServicePort {
     public List<Dish> getDishes(Integer idRestaurant, Integer idCategory, Integer page) {
         validator.isIdValid(idRestaurant);
         if (idCategory > 0) {
-            return dishPersistencePort.getDishesByRestaurantIdAndCategoryId(Long.valueOf(idRestaurant), Long.valueOf(idCategory),page);
+            return dishPersistencePort.getDishesByRestaurantIdAndCategoryIdPageable(Long.valueOf(idRestaurant), Long.valueOf(idCategory),page);
         }
-        return dishPersistencePort.getDishesByRestaurantId(Long.valueOf(idRestaurant),page);
+        return dishPersistencePort.getDishesByRestaurantIdPageable(Long.valueOf(idRestaurant),page);
     }
 }
