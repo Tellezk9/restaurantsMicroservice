@@ -9,5 +9,6 @@ import java.util.List;
 
 public interface IDishRepository extends JpaRepository<DishEntity, Long> {
     List<DishEntity> findByRestaurantEntityIdAndActive(Long idRestaurant, Boolean active, Pageable pageable);
+    List<DishEntity> findByRestaurantEntityIdAndActive(Long idRestaurant, Boolean active);
     List<DishEntity> findByRestaurantEntityIdAndCategoryEntityIdAndActive(Long idRestaurant, Long idCategory, Boolean active, Pageable pageable);
 }

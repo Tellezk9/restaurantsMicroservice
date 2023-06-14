@@ -9,6 +9,7 @@ public interface IDishPersistencePort {
     void updateDish(Long idDish, String description,Integer price);
     Dish getDishById(Long id);
     void changeDishState(Long idDish, Boolean state);
-    List<Dish> getDishesByRestaurantId(Long idRestaurant,Integer page);
-    List<Dish> getDishesByRestaurantIdAndCategoryId(Long idRestaurant,Long idCategory,Integer page);
+    List<Dish> getDishesByRestaurantIdPageable(Long idRestaurant,Integer page);
+    List<Dish> getDishesByRestaurantId(Long idRestaurant);
+    List<Dish> getDishesByRestaurantIdAndCategoryIdPageable(Long idRestaurant,Long idCategory,Integer page);
 }

@@ -55,9 +55,17 @@ public class DishMysqlAdapter implements IDishPersistencePort {
         dishEntity.setActive(state);
         dishRepository.save(dishEntity);
     }
+    @Override
+    public List<Dish> getDishesByRestaurantId(Long idRestaurant) {
+        List<DishEntity> dishEntities = dishRepository.findByRestaurantEntityIdAndActive(idRestaurant,true);
+        if (dishEntities.isEmpty()) {
+            throw new DishNotFoundException();
+        }
+        return dishEntityMapper.toListDish(dishEntities);
+    }
 
     @Override
-    public List<Dish> getDishesByRestaurantId(Long idRestaurant, Integer page) {
+    public List<Dish> getDishesByRestaurantIdPageable(Long idRestaurant, Integer page) {
         Pageable pagination = PageRequest.of(page, MAX_PAGE_SIZE);
         List<DishEntity> dishEntities = dishRepository.findByRestaurantEntityIdAndActive(idRestaurant,true, pagination);
         if (dishEntities.isEmpty()) {
@@ -66,7 +74,7 @@ public class DishMysqlAdapter implements IDishPersistencePort {
         return dishEntityMapper.toListDish(dishEntities);
     }
 
-    public List<Dish> getDishesByRestaurantIdAndCategoryId(Long idRestaurant, Long idCategory, Integer page) {
+    public List<Dish> getDishesByRestaurantIdAndCategoryIdPageable(Long idRestaurant, Long idCategory, Integer page) {
         Pageable pagination = PageRequest.of(page, MAX_PAGE_SIZE);
         List<DishEntity> dishEntities = dishRepository.findByRestaurantEntityIdAndCategoryEntityIdAndActive(idRestaurant, idCategory,true, pagination);
         if (dishEntities.isEmpty()) {

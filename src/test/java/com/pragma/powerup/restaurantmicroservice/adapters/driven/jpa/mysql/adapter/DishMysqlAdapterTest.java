@@ -121,7 +121,7 @@ class DishMysqlAdapterTest {
 
         when(dishRepository.findByRestaurantEntityIdAndActive(idRestaurant, true, pageable)).thenReturn(dishEntities);
 
-        dishMysqlAdapter.getDishesByRestaurantId(idRestaurant, page);
+        dishMysqlAdapter.getDishesByRestaurantIdPageable(idRestaurant, page);
 
         verify(dishRepository, times(1)).findByRestaurantEntityIdAndActive(idRestaurant, true, pageable);
     }
@@ -135,7 +135,7 @@ class DishMysqlAdapterTest {
 
         when(dishRepository.findByRestaurantEntityIdAndActive(idRestaurant, true, pageable)).thenReturn(dishEntities);
 
-        assertThrows(DishNotFoundException.class, () -> dishMysqlAdapter.getDishesByRestaurantId(idRestaurant, page));
+        assertThrows(DishNotFoundException.class, () -> dishMysqlAdapter.getDishesByRestaurantIdPageable(idRestaurant, page));
         verify(dishRepository, times(1)).findByRestaurantEntityIdAndActive(idRestaurant, true, pageable);
     }
 
@@ -152,7 +152,7 @@ class DishMysqlAdapterTest {
 
         when(dishRepository.findByRestaurantEntityIdAndCategoryEntityIdAndActive(idRestaurant, idCategory, true, pageable)).thenReturn(dishEntities);
 
-        dishMysqlAdapter.getDishesByRestaurantIdAndCategoryId(idRestaurant, idCategory, page);
+        dishMysqlAdapter.getDishesByRestaurantIdAndCategoryIdPageable(idRestaurant, idCategory, page);
 
         verify(dishRepository, times(1)).findByRestaurantEntityIdAndCategoryEntityIdAndActive(idRestaurant, idCategory, true, pageable);
     }
@@ -167,7 +167,7 @@ class DishMysqlAdapterTest {
 
         when(dishRepository.findByRestaurantEntityIdAndCategoryEntityIdAndActive(idRestaurant, idCategory, true, pageable)).thenReturn(dishEntities);
 
-        assertThrows(DishNotFoundException.class, () -> dishMysqlAdapter.getDishesByRestaurantIdAndCategoryId(idRestaurant, idCategory, page));
+        assertThrows(DishNotFoundException.class, () -> dishMysqlAdapter.getDishesByRestaurantIdAndCategoryIdPageable(idRestaurant, idCategory, page));
         verify(dishRepository, times(1)).findByRestaurantEntityIdAndCategoryEntityIdAndActive(idRestaurant, idCategory, true, pageable);
     }
 }

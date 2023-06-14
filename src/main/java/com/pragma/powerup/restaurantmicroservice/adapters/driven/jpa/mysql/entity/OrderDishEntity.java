@@ -13,7 +13,16 @@ import lombok.Setter;
 @Getter
 @Setter
 public class OrderDishEntity {
-    @EmbeddedId
-    private OrderPk id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private Integer amount;
+
+    @ManyToOne
+    @JoinColumn(name = "id_order")
+    private OrderEntity orderEntity;
+
+    @ManyToOne
+    @JoinColumn(name = "id_dish")
+    private DishEntity dishEntity;
 }
