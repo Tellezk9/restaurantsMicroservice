@@ -26,6 +26,8 @@ public class Constants {
     public static final String DISH_CREATED_MESSAGE = "Dish created successfully";
     public static final String DISH_UPDATED_MESSAGE = "Dish updated successfully";
     public static final String ORDER_CREATED_MESSAGE = "Order created successfully";
+    public static final String ORDER_ASSIGNED_MESSAGE = "Order assigned successfully";
+    public static final String ORDER_STATUS_CHANGED_MESSAGE = "Order status changed successfully";
     public static final String RESPONSE_ERROR_MESSAGE_KEY = "error";
     public static final String RESPONSE_ERROR_EXECUTION = "error to make the process";
     public static final String ROLE_NOT_ALLOWED_FOR_ACTION_MESSAGE = "Permission to perform this action has not been granted with this role";
@@ -49,6 +51,7 @@ public class Constants {
     public static final String ORDER_NOT_FOUND_MESSAGE = "Order not found";
     public static final String EMPLOYEE_DOES_NOT_BELONG_RESTAURANT_MESSAGE = "The employee does not belong to the restaurant";
     public static final String INVALID_VALUE_MESSAGE = "The value/s must be greater than 0(zero)";
+    public static final String INVALID_STATUS_MESSAGE = "The status value is invalid";
 
     public static final String USER_IS_NOT_LEGAL_AGE = "The user is not legal age";
     public static final String INVALID_FORMAT_URL_MESSAGE = "The url is not valid";

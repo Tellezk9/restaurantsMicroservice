@@ -99,10 +99,10 @@ class OrderMysqlAdapterTest {
         when(orderRepository.findByRestaurantEntityIdAndStatus(idRestaurant, status, pageable)).thenReturn(orderEntityList);
         when(orderEntityMapper.toOrderList(orderEntityList)).thenReturn(orderList);
 
-        orderMysqlAdapter.getOrdersPageable(status,idRestaurant,page);
+        orderMysqlAdapter.getOrdersPageable(status, idRestaurant, page);
 
-        verify(orderRepository,times(1)).findByRestaurantEntityIdAndStatus(idRestaurant,status,pageable);
-        verify(orderEntityMapper,times(1)).toOrderList(orderEntityList);
+        verify(orderRepository, times(1)).findByRestaurantEntityIdAndStatus(idRestaurant, status, pageable);
+        verify(orderEntityMapper, times(1)).toOrderList(orderEntityList);
     }
 
     @Test
@@ -115,7 +115,59 @@ class OrderMysqlAdapterTest {
 
         when(orderRepository.findByRestaurantEntityIdAndStatus(idRestaurant, status, pageable)).thenReturn(orderEntityList);
 
-        assertThrows(OrderNotFoundException.class, () -> orderMysqlAdapter.getOrdersPageable(status,idRestaurant,page));
-
+        assertThrows(OrderNotFoundException.class, () -> orderMysqlAdapter.getOrdersPageable(status, idRestaurant, page));
     }
+
+    @Test
+    void assignOrder() {
+        Long idOrder = 1L;
+        Long idEmployee = 1L;
+        Long status = 1L;
+
+        OrderEntity orderEntity = new OrderEntity(idOrder, null, null, status, idEmployee, null);
+
+        when(orderRepository.findById(idOrder)).thenReturn(Optional.of(orderEntity));
+
+        orderMysqlAdapter.assignOrder(idOrder, idEmployee, status);
+
+        verify(orderRepository, times(1)).findById(idOrder);
+    }
+
+    @Test
+    void assignOrder_Conflict() {
+        Long idOrder = 1L;
+        Long idEmployee = 1L;
+        Long status = 1L;
+
+        when(orderRepository.findById(idOrder)).thenReturn(Optional.empty());
+
+        assertThrows(OrderNotFoundException.class, () -> orderMysqlAdapter.assignOrder(idOrder, idEmployee, status));
+        verify(orderRepository, times(1)).findById(idOrder);
+    }
+
+    @Test
+    void changeOrderStatus() {
+        Long idOrder = 1L;
+        Long status = 1L;
+
+        OrderEntity orderEntity = new OrderEntity(idOrder, null, null, status, null, null);
+
+        when(orderRepository.findById(idOrder)).thenReturn(Optional.of(orderEntity));
+
+        orderMysqlAdapter.changeOrderStatus(idOrder, status);
+
+        verify(orderRepository, times(1)).findById(idOrder);
+    }
+
+    @Test
+    void changeOrderStatus_Conflict() {
+        Long idOrder = 1L;
+        Long status = 1L;
+
+        when(orderRepository.findById(idOrder)).thenReturn(Optional.empty());
+
+        assertThrows(OrderNotFoundException.class, () -> orderMysqlAdapter.changeOrderStatus(idOrder, status));
+        verify(orderRepository, times(1)).findById(idOrder);
+    }
+
 }

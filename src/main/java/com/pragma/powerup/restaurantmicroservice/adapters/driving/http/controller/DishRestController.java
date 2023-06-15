@@ -38,7 +38,7 @@ public class DishRestController {
                     @ApiResponse(responseCode = "403", description = "Role not allowed for restaurant creation",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
     @PostMapping
-    public ResponseEntity<Map<String,String>> saveDish(@Valid @RequestBody DishRequestDto dishRequestDto){
+    public ResponseEntity<Map<String, String>> saveDish(@Valid @RequestBody DishRequestDto dishRequestDto) {
         dishHandler.saveDish(dishRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.DISH_CREATED_MESSAGE));
@@ -46,15 +46,12 @@ public class DishRestController {
 
     @Operation(summary = "Update a dish",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "" +
-                            " updated",
+                    @ApiResponse(responseCode = "201", description = "dish updated",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Map"))),
-                    @ApiResponse(responseCode = "409", description = "Restaurant exists",
-                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error"))),
-                    @ApiResponse(responseCode = "403", description = "Role not allowed for restaurant creation",
+                    @ApiResponse(responseCode = "403", description = "Role not allowed for dish modification",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
     @PutMapping("/{id}")
-    public ResponseEntity<Map<String,String>> updateDish(@PathVariable Integer id, @RequestParam String description, @RequestParam Integer price){
+    public ResponseEntity<Map<String, String>> updateDish(@PathVariable Integer id, @RequestParam String description, @RequestParam Integer price) {
         dishHandler.updateDish(id, description, price);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.DISH_UPDATED_MESSAGE));
     }
@@ -70,7 +67,7 @@ public class DishRestController {
                     @ApiResponse(responseCode = "403", description = "Role not allowed for update dish state",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
     @PutMapping("/changeStateDish")
-    public ResponseEntity<Map<String,String>> changeDishState(@RequestParam Integer idDish , Boolean state){
+    public ResponseEntity<Map<String, String>> changeDishState(@RequestParam Integer idDish, Boolean state) {
         dishHandler.changeDishState(idDish, state);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.DISH_UPDATED_MESSAGE));
     }

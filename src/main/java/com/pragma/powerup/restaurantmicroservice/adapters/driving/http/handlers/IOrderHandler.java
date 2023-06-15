@@ -10,4 +10,6 @@ public interface IOrderHandler {
     void saveOrder(OrderRequestDto orderRequestDto);
     List<OrderResponseDto> getOrders(Long status, Long idRestaurant, Integer page);
     List<OrderDishResponseDto> getOrderDish(Long idOrder);
+    void assignOrder(Long idOrder);
+    void changeOrderStatus(Long idOrder,Long status);
 }

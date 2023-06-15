@@ -9,4 +9,6 @@ public interface IOrderServicePort {
     void saveOrder(Long idRestaurant, List<Long> orderDishes, List<Integer> amountDishes);
     List<Order> getOrders(Long status, Long idRestaurant, Integer page);
     List<OrderDish> getOrderDishes(Long idOrder);
+    void assignOrder(Long idOrder);
+    void changeOrderStatus(Long idOrder, Long status);
 }

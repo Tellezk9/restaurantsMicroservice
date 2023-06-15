@@ -1,9 +1,7 @@
 package com.pragma.powerup.restaurantmicroservice.domain.service;
 
-import com.pragma.powerup.restaurantmicroservice.domain.exceptions.DishDoesNotBelongToTheRestaurantException;
-import com.pragma.powerup.restaurantmicroservice.domain.exceptions.EmptyFieldFoundException;
-import com.pragma.powerup.restaurantmicroservice.domain.exceptions.InvalidValueException;
-import com.pragma.powerup.restaurantmicroservice.domain.exceptions.OrderAndAmountIsNotEqualsException;
+import com.pragma.powerup.restaurantmicroservice.configuration.Constants;
+import com.pragma.powerup.restaurantmicroservice.domain.exceptions.*;
 import com.pragma.powerup.restaurantmicroservice.domain.model.Dish;
 import com.pragma.powerup.restaurantmicroservice.domain.model.Order;
 import com.pragma.powerup.restaurantmicroservice.domain.model.OrderDish;
@@ -79,5 +77,16 @@ public class OrderService {
             orderDishList.add(new OrderDish(order,dish,amounts.get(i)));
         }
         return orderDishList;
+    }
+
+    public boolean isValidStatus(Long status){
+        if (status == null || status <= 0){
+            throw new EmptyFieldFoundException();
+        }
+        if (!(status.equals(Constants.ORDER_STATUS_OK) || status.equals(Constants.ORDER_STATUS_PENDING) || status.equals(Constants.ORDER_STATUS_PREPARING))){
+            throw new InvalidStatusException();
+        }
+
+        return true;
     }
 }

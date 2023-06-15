@@ -53,8 +53,9 @@ public class OrderRestController {
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
     @GetMapping("/getOrders")
     public ResponseEntity<List<OrderResponseDto>> getOrders(@RequestParam Long status, Long idRestaurant, @Parameter(description = "Number of the page to list restaurants") @RequestParam Integer page) {
-        return ResponseEntity.ok(orderHandler.getOrders(status, idRestaurant,page));
+        return ResponseEntity.ok(orderHandler.getOrders(status, idRestaurant, page));
     }
+
     @Operation(summary = "get order dishes",
             responses = {
                     @ApiResponse(responseCode = "200", description = "All order dishes by idOrder returned",
@@ -65,5 +66,33 @@ public class OrderRestController {
     @GetMapping("/getOrderDish/{idOrder}")
     public ResponseEntity<List<OrderDishResponseDto>> getOrderDishes(@PathVariable Long idOrder) {
         return ResponseEntity.ok(orderHandler.getOrderDish(idOrder));
+    }
+
+    @Operation(summary = "Assign a order",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Assigned order",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Map"))),
+                    @ApiResponse(responseCode = "403", description = "Role not allowed for assign order",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
+
+    @PutMapping("/assignOrder/{idOrder}")
+    public ResponseEntity<Map<String, String>> assignOrder(@PathVariable Long idOrder) {
+        orderHandler.assignOrder(idOrder);
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_ASSIGNED_MESSAGE));
+    }
+
+    @Operation(summary = "Change order status",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "status changed",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Map"))),
+                    @ApiResponse(responseCode = "403", description = "Role not allowed for change order status",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
+
+    @PutMapping("/changeOrderStatus")
+    public ResponseEntity<Map<String, String>> changeOrderStatus(@RequestParam Long idOrder,Long status) {
+        orderHandler.changeOrderStatus(idOrder,status);
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_STATUS_CHANGED_MESSAGE));
     }
 }

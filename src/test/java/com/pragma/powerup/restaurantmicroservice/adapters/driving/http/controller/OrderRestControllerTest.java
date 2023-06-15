@@ -20,10 +20,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -99,5 +97,35 @@ class OrderRestControllerTest {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0]nameDish").value(orderResponseDtoList.get(0).getNameDish()))
                 .andExpect(jsonPath("$[0]amount").value(orderResponseDtoList.get(0).getAmount()));
+    }
+
+    @Test
+    void assignOrder() throws Exception {
+        Long idOrder = 1L;
+        doNothing().when(orderHandler).assignOrder(idOrder);
+
+        mockMvc.perform(put("/order/assignOrder/{idOrder}",idOrder))
+                .andDo(print())
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.message").value(Constants.ORDER_ASSIGNED_MESSAGE));
+
+        verify(orderHandler,times(1)).assignOrder(idOrder);
+    }
+
+    @Test
+    void changeOrderStatus() throws Exception {
+        Long idOrder = 1L;
+        Long status = 1L;
+        doNothing().when(orderHandler).changeOrderStatus(idOrder,status);
+
+        mockMvc.perform(put("/order/changeOrderStatus")
+                        .param("idOrder",String.valueOf(idOrder))
+                        .param("status",String.valueOf(status))
+                )
+                .andDo(print())
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.message").value(Constants.ORDER_STATUS_CHANGED_MESSAGE));
+
+        verify(orderHandler,times(1)).changeOrderStatus(idOrder,status);
     }
 }
