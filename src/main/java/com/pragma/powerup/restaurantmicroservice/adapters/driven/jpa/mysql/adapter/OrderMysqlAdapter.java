@@ -35,7 +35,17 @@ public class OrderMysqlAdapter implements IOrderPersistencePort {
     @Override
     public Order findOrderInformation(Order order) {
         Optional<OrderEntity> orderEntity = orderRepository.findByIdClientAndRestaurantEntityIdAndStatus(order.getIdClient(), order.getRestaurant().getId(), order.getStatus());
-        if (!orderEntity.isPresent()) {
+        if (orderEntity.isEmpty()) {
+            throw new OrderNotFoundException();
+        }
+
+        return orderEntityMapper.toOrder(orderEntity.get());
+    }
+
+    @Override
+    public Order getOrder(Long idOrder){
+        Optional<OrderEntity> orderEntity = orderRepository.findById(idOrder);
+        if (orderEntity.isEmpty()) {
             throw new OrderNotFoundException();
         }
 
@@ -51,5 +61,27 @@ public class OrderMysqlAdapter implements IOrderPersistencePort {
             throw new OrderNotFoundException();
         }
         return orderEntityMapper.toOrderList(orderEntityList);
+    }
+
+    @Override
+    public void assignOrder(Long idOrder,Long idEmployee,Long status) {
+        Optional<OrderEntity> orderEntity = orderRepository.findById(idOrder);
+
+        if (orderEntity.isEmpty()) {
+            throw new OrderNotFoundException();
+        }
+        orderEntity.get().setStatus(status);
+        orderEntity.get().setIdChef(idEmployee);
+        orderRepository.save(orderEntity.get());
+    }
+
+    @Override
+    public void changeOrderStatus(Long idOrder, Long status) {
+        Optional<OrderEntity> orderEntity = orderRepository.findById(idOrder);
+        if (orderEntity.isEmpty()){
+            throw new OrderNotFoundException();
+        }
+        orderEntity.get().setStatus(status);
+        orderRepository.save(orderEntity.get());
     }
 }

@@ -34,4 +34,14 @@ public class OrderHandlerImpl implements IOrderHandler {
     public List<OrderDishResponseDto> getOrderDish(Long idOrder) {
         return orderDishResponseMapper.toListOrderDishResponseDto(orderServicePort.getOrderDishes(idOrder));
     }
+
+    @Override
+    public void assignOrder(Long idOrder) {
+        orderServicePort.assignOrder(idOrder);
+    }
+
+    @Override
+    public void changeOrderStatus(Long idOrder, Long status) {
+        orderServicePort.changeOrderStatus(idOrder, status);
+    }
 }

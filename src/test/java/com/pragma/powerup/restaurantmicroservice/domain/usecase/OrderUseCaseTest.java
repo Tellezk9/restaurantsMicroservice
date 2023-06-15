@@ -1,5 +1,6 @@
 package com.pragma.powerup.restaurantmicroservice.domain.usecase;
 
+import com.pragma.powerup.restaurantmicroservice.configuration.Constants;
 import com.pragma.powerup.restaurantmicroservice.domain.auth.IPrincipalUser;
 import com.pragma.powerup.restaurantmicroservice.domain.model.*;
 import com.pragma.powerup.restaurantmicroservice.domain.spi.IDishPersistencePort;
@@ -98,6 +99,51 @@ class OrderUseCaseTest {
         orderUseCase.getOrderDishes(idOrder);
 
         verify(orderDishPersistencePort, times(1)).getOrderDishes(idOrder);
+    }
 
+    @Test
+    void assignOrder() {
+        Long idOrder = 1L;
+        Long idUser = 1L;
+        String role = "ROLE_EMPLOYEE";
+
+        Restaurant restaurant = new Restaurant(1L, null, null, null, null, null, null);
+        Order order = new Order(idOrder, null, null, null, idUser, restaurant);
+        Employee employee = new Employee(1L, idUser, restaurant);
+
+        when(authUser.getIdUser()).thenReturn(idUser);
+        when(authUser.getRole()).thenReturn(role);
+        when(orderPersistencePort.getOrder(idOrder)).thenReturn(order);
+        when(employeePersistencePort.getEmployeeByIdEmployeeAndIdRestaurant(idUser, order.getRestaurant().getId())).thenReturn(employee);
+        doNothing().when(orderPersistencePort).assignOrder(idOrder, idUser, Constants.ORDER_STATUS_PREPARING);
+
+        orderUseCase.assignOrder(idOrder);
+
+        verify(orderPersistencePort, times(1)).getOrder(idOrder);
+        verify(orderPersistencePort, times(1)).assignOrder(idOrder, idUser, Constants.ORDER_STATUS_PREPARING);
+        verify(employeePersistencePort, times(1)).getEmployeeByIdEmployeeAndIdRestaurant(idUser, order.getRestaurant().getId());
+    }
+    @Test
+    void changeOrderStatus() {
+        Long idOrder = 1L;
+        Long status = 1L;
+        Long idUser = 1L;
+        String role = "ROLE_EMPLOYEE";
+
+        Restaurant restaurant = new Restaurant(1L, null, null, null, null, null, null);
+        Order order = new Order(idOrder, null, null, null, idUser, restaurant);
+        Employee employee = new Employee(1L, idUser, restaurant);
+
+        when(authUser.getIdUser()).thenReturn(idUser);
+        when(authUser.getRole()).thenReturn(role);
+        when(orderPersistencePort.getOrder(idOrder)).thenReturn(order);
+        when(employeePersistencePort.getEmployeeByIdEmployeeAndIdRestaurant(idUser, order.getRestaurant().getId())).thenReturn(employee);
+        doNothing().when(orderPersistencePort).changeOrderStatus(idOrder,status);
+
+        orderUseCase.changeOrderStatus(idOrder,status);
+
+        verify(orderPersistencePort, times(1)).getOrder(idOrder);
+        verify(orderPersistencePort, times(1)).changeOrderStatus(idOrder,status);
+        verify(employeePersistencePort, times(1)).getEmployeeByIdEmployeeAndIdRestaurant(idUser, order.getRestaurant().getId());
     }
 }

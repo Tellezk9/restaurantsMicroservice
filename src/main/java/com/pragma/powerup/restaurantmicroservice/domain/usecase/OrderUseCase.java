@@ -62,12 +62,40 @@ public class OrderUseCase implements IOrderServicePort {
         validator.isIdValid(Integer.valueOf(String.valueOf(idRestaurant)));
 
         employeePersistencePort.getEmployeeByIdEmployeeAndIdRestaurant(authUser.getIdUser(), idRestaurant);
+
         return orderPersistencePort.getOrdersPageable(status, idRestaurant, page);
     }
 
     @Override
     public List<OrderDish> getOrderDishes(Long idOrder) {
         validator.hasRoleValid(authUser.getRole(), Constants.EMPLOYEE_ROLE_NAME);
+        validator.isIdValid(Integer.valueOf(String.valueOf(idOrder)));
+
         return orderDishPersistencePort.getOrderDishes(idOrder);
+    }
+
+    @Override
+    public void assignOrder(Long idOrder) {
+        validator.hasRoleValid(authUser.getRole(), Constants.EMPLOYEE_ROLE_NAME);
+        validator.isIdValid(Integer.valueOf(String.valueOf(idOrder)));
+
+        Order order = orderPersistencePort.getOrder(idOrder);
+        employeePersistencePort.getEmployeeByIdEmployeeAndIdRestaurant(authUser.getIdUser(),order.getRestaurant().getId());
+
+        orderPersistencePort.assignOrder(idOrder, authUser.getIdUser(), Constants.ORDER_STATUS_PREPARING);
+    }
+
+    @Override
+    public void changeOrderStatus(Long idOrder, Long status) {
+        validator.hasRoleValid(authUser.getRole(), Constants.EMPLOYEE_ROLE_NAME);
+        validator.isIdValid(Integer.valueOf(String.valueOf(idOrder)));
+        validator.isIdValid(Integer.valueOf(String.valueOf(status)));
+
+        orderService.isValidStatus(status);
+
+        Order order = orderPersistencePort.getOrder(idOrder);
+        employeePersistencePort.getEmployeeByIdEmployeeAndIdRestaurant(authUser.getIdUser(),order.getRestaurant().getId());
+
+        orderPersistencePort.changeOrderStatus(idOrder,status);
     }
 }

@@ -209,5 +209,11 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, EMPLOYEE_DOES_NOT_BELONG_RESTAURANT_MESSAGE));
     }
+    @ExceptionHandler(InvalidStatusException.class)
+    public ResponseEntity<Map<String, String>> invalidStatusException(
+            InvalidStatusException invalidStatusException) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, INVALID_STATUS_MESSAGE));
+    }
 
 }

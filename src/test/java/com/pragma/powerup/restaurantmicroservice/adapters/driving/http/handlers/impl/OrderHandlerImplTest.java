@@ -80,4 +80,24 @@ class OrderHandlerImplTest {
         verify(orderServicePort, times(1)).getOrderDishes(idOrder);
         verify(orderDishResponseMapper, times(1)).toListOrderDishResponseDto(orderDishList);
     }
+
+    @Test
+    void assignOrder(){
+        Long idOrder = 1L;
+        doNothing().when(orderServicePort).assignOrder(idOrder);
+        orderHandler.assignOrder(idOrder);
+
+        verify(orderServicePort,times(1)).assignOrder(idOrder);
+    }
+
+    @Test
+    void changeOrderStatus(){
+        Long idOrder = 1L;
+        Long status = 1L;
+
+        doNothing().when(orderServicePort).changeOrderStatus(idOrder,status);
+        orderHandler.changeOrderStatus(idOrder,status);
+
+        verify(orderServicePort,times(1)).changeOrderStatus(idOrder,status);
+    }
 }
