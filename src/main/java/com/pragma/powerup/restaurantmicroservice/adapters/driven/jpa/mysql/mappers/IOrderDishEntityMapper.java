@@ -12,8 +12,14 @@ import java.util.List;
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface IOrderDishEntityMapper {
-    @Mapping(target = "orderEntity.id",source = "idOrder")
-    @Mapping(target = "dishEntity.id",source = "orderDish")
+    @Mapping(target = "orderEntity.id",source = "order.id")
+    @Mapping(target = "dishEntity.id",source = "orderDish.id")
     OrderDishEntity toOrderDishEntity(OrderDish orderDish);
     List<OrderDishEntity> toListOrderDishEntity(List<OrderDish> orderDishes);
+
+    @Mapping(target = "order",source = "orderEntity")
+    @Mapping(target = "orderDish",source = "dishEntity")
+    OrderDish toOrderDish(OrderDishEntity orderDishEntities);
+    List<OrderDish> toListOrderDish(List<OrderDishEntity> orderDishEntities);
+
 }

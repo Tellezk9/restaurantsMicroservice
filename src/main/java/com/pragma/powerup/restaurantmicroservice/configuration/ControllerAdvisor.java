@@ -203,5 +203,11 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, ORDER_NOT_FOUND_MESSAGE));
     }
+    @ExceptionHandler(EmployeeDoesNotBelongRestaurantException.class)
+    public ResponseEntity<Map<String, String>> employeeDoesNotBelongRestaurantException(
+            EmployeeDoesNotBelongRestaurantException employeeDoesNotBelongRestaurantException) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, EMPLOYEE_DOES_NOT_BELONG_RESTAURANT_MESSAGE));
+    }
 
 }

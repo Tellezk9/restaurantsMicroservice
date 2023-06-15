@@ -47,6 +47,7 @@ public class Constants {
     public static final String ORDER_AND_AMOUNT_IS_NOT_EQUALS_MESSAGE = "each order of dishes must have its respective amount";
     public static final String CLIENT_HAS_PENDING_ORDER_MESSAGE = "The client has a pending order";
     public static final String ORDER_NOT_FOUND_MESSAGE = "Order not found";
+    public static final String EMPLOYEE_DOES_NOT_BELONG_RESTAURANT_MESSAGE = "The employee does not belong to the restaurant";
     public static final String INVALID_VALUE_MESSAGE = "The value/s must be greater than 0(zero)";
 
     public static final String USER_IS_NOT_LEGAL_AGE = "The user is not legal age";

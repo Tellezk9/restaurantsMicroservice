@@ -14,7 +14,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,13 +40,14 @@ class OrderMysqlAdapterTest {
         RestaurantEntity restaurantEntity = new RestaurantEntity(1L, null, null, null, null, null, null);
         OrderEntity orderEntity = new OrderEntity(1L, 1L, null, 2L, null, restaurantEntity);
 
-        when(orderRepository.findByIdClientAndRestaurantEntityIdAndStatusNot(order.getIdClient(), order.getIdRestaurant().getId(), Constants.ORDER_STATUS_OK)).thenReturn(Optional.empty());
+        when(orderRepository.findByIdClientAndRestaurantEntityIdAndStatusNot(order.getIdClient(), order.getRestaurant().getId(), Constants.ORDER_STATUS_OK)).thenReturn(Optional.empty());
         when(orderEntityMapper.toOrderEntity(order)).thenReturn(orderEntity);
 
         orderMysqlAdapter.saveOrderInformation(order);
 
-        verify(orderEntityMapper,times(1)).toOrderEntity(order);
+        verify(orderEntityMapper, times(1)).toOrderEntity(order);
     }
+
     @Test
     void saveOrderInformationConflict() {
         Restaurant restaurant = new Restaurant(1L, null, null, null, null, null, null);
@@ -52,9 +56,9 @@ class OrderMysqlAdapterTest {
         RestaurantEntity restaurantEntity = new RestaurantEntity(1L, null, null, null, null, null, null);
         OrderEntity orderEntity = new OrderEntity(1L, 1L, null, 2L, null, restaurantEntity);
 
-        when(orderRepository.findByIdClientAndRestaurantEntityIdAndStatusNot(order.getIdClient(), order.getIdRestaurant().getId(), Constants.ORDER_STATUS_OK)).thenReturn(Optional.of(orderEntity));
+        when(orderRepository.findByIdClientAndRestaurantEntityIdAndStatusNot(order.getIdClient(), order.getRestaurant().getId(), Constants.ORDER_STATUS_OK)).thenReturn(Optional.of(orderEntity));
 
-        assertThrows(ClientHasPendingOrderException.class,()->orderMysqlAdapter.saveOrderInformation(order));
+        assertThrows(ClientHasPendingOrderException.class, () -> orderMysqlAdapter.saveOrderInformation(order));
     }
 
     @Test
@@ -65,21 +69,53 @@ class OrderMysqlAdapterTest {
         RestaurantEntity restaurantEntity = new RestaurantEntity(1L, null, null, null, null, null, null);
         OrderEntity orderEntity = new OrderEntity(1L, 1L, null, 2L, null, restaurantEntity);
 
-        when(orderRepository.findByIdClientAndRestaurantEntityIdAndStatus(order.getIdClient(), order.getIdRestaurant().getId(), order.getStatus())).thenReturn(Optional.of(orderEntity));
+        when(orderRepository.findByIdClientAndRestaurantEntityIdAndStatus(order.getIdClient(), order.getRestaurant().getId(), order.getStatus())).thenReturn(Optional.of(orderEntity));
         when(orderEntityMapper.toOrder(orderEntity)).thenReturn(order);
 
         orderMysqlAdapter.findOrderInformation(order);
 
-        verify(orderEntityMapper,times(1)).toOrder(orderEntity);
+        verify(orderEntityMapper, times(1)).toOrder(orderEntity);
     }
+
     @Test
     void findOrderInformationConflict() {
         Restaurant restaurant = new Restaurant(1L, null, null, null, null, null, null);
         Order order = new Order(null, 1L, null, 2L, null, restaurant);
 
-        when(orderRepository.findByIdClientAndRestaurantEntityIdAndStatus(order.getIdClient(), order.getIdRestaurant().getId(), order.getStatus())).thenReturn(Optional.empty());
+        when(orderRepository.findByIdClientAndRestaurantEntityIdAndStatus(order.getIdClient(), order.getRestaurant().getId(), order.getStatus())).thenReturn(Optional.empty());
 
-        assertThrows(OrderNotFoundException.class,()->orderMysqlAdapter.findOrderInformation(order));
+        assertThrows(OrderNotFoundException.class, () -> orderMysqlAdapter.findOrderInformation(order));
+    }
+
+    @Test
+    void getOrdersPageable() {
+        Long idRestaurant = 1L;
+        Long status = 1L;
+        int page = 1;
+        Pageable pageable = PageRequest.of(page, Constants.MAX_PAGE_SIZE);
+        List<OrderEntity> orderEntityList = List.of(new OrderEntity());
+        List<Order> orderList = List.of(new Order(null, null, null, null, null, null));
+
+        when(orderRepository.findByRestaurantEntityIdAndStatus(idRestaurant, status, pageable)).thenReturn(orderEntityList);
+        when(orderEntityMapper.toOrderList(orderEntityList)).thenReturn(orderList);
+
+        orderMysqlAdapter.getOrdersPageable(status,idRestaurant,page);
+
+        verify(orderRepository,times(1)).findByRestaurantEntityIdAndStatus(idRestaurant,status,pageable);
+        verify(orderEntityMapper,times(1)).toOrderList(orderEntityList);
+    }
+
+    @Test
+    void getOrdersPageable_Conflict() {
+        Long idRestaurant = 1L;
+        Long status = 1L;
+        int page = 1;
+        Pageable pageable = PageRequest.of(page, Constants.MAX_PAGE_SIZE);
+        List<OrderEntity> orderEntityList = List.of();
+
+        when(orderRepository.findByRestaurantEntityIdAndStatus(idRestaurant, status, pageable)).thenReturn(orderEntityList);
+
+        assertThrows(OrderNotFoundException.class, () -> orderMysqlAdapter.getOrdersPageable(status,idRestaurant,page));
 
     }
 }

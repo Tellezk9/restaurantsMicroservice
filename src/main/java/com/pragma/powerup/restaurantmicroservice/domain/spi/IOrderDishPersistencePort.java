@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface IOrderDishPersistencePort {
     void saveOrderDish(List<OrderDish> orderDish);
+    List<OrderDish> getOrderDishPageable(Long status, Long idRestaurant,Integer page);
+    List<OrderDish> getOrderDishes(Long idOrder);
 }

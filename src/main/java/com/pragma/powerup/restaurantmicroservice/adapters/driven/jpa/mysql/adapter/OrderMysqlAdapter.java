@@ -9,17 +9,23 @@ import com.pragma.powerup.restaurantmicroservice.configuration.Constants;
 import com.pragma.powerup.restaurantmicroservice.domain.model.Order;
 import com.pragma.powerup.restaurantmicroservice.domain.spi.IOrderPersistencePort;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
+
+import static com.pragma.powerup.restaurantmicroservice.configuration.Constants.MAX_PAGE_SIZE;
 
 @AllArgsConstructor
 public class OrderMysqlAdapter implements IOrderPersistencePort {
     private final IOrderRepository orderRepository;
     private final IOrderEntityMapper orderEntityMapper;
+
     @Override
     public void saveOrderInformation(Order order) {
-        Optional<OrderEntity> orderEntity = orderRepository.findByIdClientAndRestaurantEntityIdAndStatusNot(order.getIdClient(),order.getIdRestaurant().getId(), Constants.ORDER_STATUS_OK);
-        if (orderEntity.isPresent()){
+        Optional<OrderEntity> orderEntity = orderRepository.findByIdClientAndRestaurantEntityIdAndStatusNot(order.getIdClient(), order.getRestaurant().getId(), Constants.ORDER_STATUS_OK);
+        if (orderEntity.isPresent()) {
             throw new ClientHasPendingOrderException();
         }
 
@@ -28,11 +34,22 @@ public class OrderMysqlAdapter implements IOrderPersistencePort {
 
     @Override
     public Order findOrderInformation(Order order) {
-        Optional<OrderEntity> orderEntity = orderRepository.findByIdClientAndRestaurantEntityIdAndStatus(order.getIdClient(),order.getIdRestaurant().getId(), order.getStatus());
-        if (!orderEntity.isPresent()){
+        Optional<OrderEntity> orderEntity = orderRepository.findByIdClientAndRestaurantEntityIdAndStatus(order.getIdClient(), order.getRestaurant().getId(), order.getStatus());
+        if (!orderEntity.isPresent()) {
             throw new OrderNotFoundException();
         }
 
         return orderEntityMapper.toOrder(orderEntity.get());
+    }
+
+    @Override
+    public List<Order> getOrdersPageable(Long status, Long idRestaurant, Integer page) {
+        Pageable pagination = PageRequest.of(page, MAX_PAGE_SIZE);
+        List<OrderEntity> orderEntityList = orderRepository.findByRestaurantEntityIdAndStatus(idRestaurant, status, pagination);
+
+        if (orderEntityList.isEmpty()) {
+            throw new OrderNotFoundException();
+        }
+        return orderEntityMapper.toOrderList(orderEntityList);
     }
 }
