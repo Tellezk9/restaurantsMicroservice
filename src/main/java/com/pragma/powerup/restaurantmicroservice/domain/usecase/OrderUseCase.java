@@ -9,6 +9,7 @@ import com.pragma.powerup.restaurantmicroservice.domain.model.OrderDish;
 import com.pragma.powerup.restaurantmicroservice.domain.service.OrderService;
 import com.pragma.powerup.restaurantmicroservice.domain.service.Validator;
 import com.pragma.powerup.restaurantmicroservice.domain.spi.IDishPersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.IEmployeePersistencePort;
 import com.pragma.powerup.restaurantmicroservice.domain.spi.IOrderDishPersistencePort;
 import com.pragma.powerup.restaurantmicroservice.domain.spi.IOrderPersistencePort;
 
@@ -19,14 +20,16 @@ public class OrderUseCase implements IOrderServicePort {
     private final IOrderPersistencePort orderPersistencePort;
     private final IOrderDishPersistencePort orderDishPersistencePort;
     private final IDishPersistencePort dishPersistencePort;
+    private final IEmployeePersistencePort employeePersistencePort;
     private final IPrincipalUser authUser;
     private final Validator validator;
     private final OrderService orderService;
 
-    public OrderUseCase(IOrderPersistencePort orderPersistencePort, IDishPersistencePort dishPersistencePort, IOrderDishPersistencePort orderDishPersistencePort, IPrincipalUser authUser) {
+    public OrderUseCase(IOrderPersistencePort orderPersistencePort, IDishPersistencePort dishPersistencePort, IOrderDishPersistencePort orderDishPersistencePort, IEmployeePersistencePort employeePersistencePort, IPrincipalUser authUser) {
         this.orderPersistencePort = orderPersistencePort;
         this.orderDishPersistencePort = orderDishPersistencePort;
         this.dishPersistencePort = dishPersistencePort;
+        this.employeePersistencePort = employeePersistencePort;
         this.authUser = authUser;
         this.validator = new Validator();
         this.orderService = new OrderService();
@@ -50,5 +53,21 @@ public class OrderUseCase implements IOrderServicePort {
         List<OrderDish> orderDishList = orderService.makeNewListOrderDish(orderInformation.getId(), orderDishes, amountDishes);
 
         orderDishPersistencePort.saveOrderDish(orderDishList);
+    }
+
+    @Override
+    public List<Order> getOrders(Long status, Long idRestaurant, Integer page) {
+        validator.hasRoleValid(authUser.getRole(), Constants.EMPLOYEE_ROLE_NAME);
+        validator.isIdValid(Integer.valueOf(String.valueOf(status)));
+        validator.isIdValid(Integer.valueOf(String.valueOf(idRestaurant)));
+
+        employeePersistencePort.getEmployeeByIdEmployeeAndIdRestaurant(authUser.getIdUser(), idRestaurant);
+        return orderPersistencePort.getOrdersPageable(status, idRestaurant, page);
+    }
+
+    @Override
+    public List<OrderDish> getOrderDishes(Long idOrder) {
+        validator.hasRoleValid(authUser.getRole(), Constants.EMPLOYEE_ROLE_NAME);
+        return orderDishPersistencePort.getOrderDishes(idOrder);
     }
 }

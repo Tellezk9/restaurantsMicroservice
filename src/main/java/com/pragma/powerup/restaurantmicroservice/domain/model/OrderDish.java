@@ -1,29 +1,29 @@
 package com.pragma.powerup.restaurantmicroservice.domain.model;
 
 public class OrderDish {
-    private Long idOrder;
-    private Long orderDish;
+    private Order order;
+    private Dish orderDish;
     private Integer amount;
 
-    public OrderDish(Long idOrder, Long orderDish, Integer amount) {
-        this.idOrder = idOrder;
+    public OrderDish(Order order, Dish orderDish, Integer amount) {
+        this.order = order;
         this.orderDish = orderDish;
         this.amount = amount;
     }
 
-    public Long getIdOrder() {
-        return idOrder;
+    public Order getOrder() {
+        return order;
     }
 
-    public void setIdOrder(Long idOrder) {
-        this.idOrder = idOrder;
+    public void setOrder(Order order) {
+        this.order = order;
     }
 
-    public Long getOrderDish() {
+    public Dish getOrderDish() {
         return orderDish;
     }
 
-    public void setOrderDish(Long orderDish) {
+    public void setOrderDish(Dish orderDish) {
         this.orderDish = orderDish;
     }
 

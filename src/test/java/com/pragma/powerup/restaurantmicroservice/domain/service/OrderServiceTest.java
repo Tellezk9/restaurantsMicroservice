@@ -87,7 +87,7 @@ class OrderServiceTest {
 
         assertEquals(expectedOrder.getIdClient(), actualOrder.getIdClient());
         assertEquals(expectedOrder.getStatus(), actualOrder.getStatus());
-        assertEquals(expectedOrder.getIdRestaurant().getId(), actualOrder.getIdRestaurant().getId());
+        assertEquals(expectedOrder.getRestaurant().getId(), actualOrder.getRestaurant().getId());
     }
 
     @Test
@@ -100,12 +100,14 @@ class OrderServiceTest {
         Long idOrder = 1L;
         List<Long> orderDishes = List.of(1L);
         List<Integer> amountDishes = List.of(1);
-        List<OrderDish> orderDishList = List.of(new OrderDish(idOrder, orderDishes.get(0), amountDishes.get(0)));
+        Order order = new Order(idOrder,null,null,null,null,null);
+        Dish dish = new Dish(orderDishes.get(0),null,null,null,null,null,null,null);
+        List<OrderDish> orderDishList = List.of(new OrderDish(order, dish, amountDishes.get(0)));
         OrderDish expectedOrderDish = orderDishList.get(0);
         List<OrderDish> actualOrder = orderService.makeNewListOrderDish(idOrder,orderDishes,amountDishes);
 
-        assertEquals(expectedOrderDish.getIdOrder(), actualOrder.get(0).getIdOrder());
-        assertEquals(expectedOrderDish.getOrderDish(), actualOrder.get(0).getOrderDish());
+        assertEquals(expectedOrderDish.getOrder().getId(), actualOrder.get(0).getOrder().getId());
+        assertEquals(expectedOrderDish.getOrderDish().getId(), actualOrder.get(0).getOrderDish().getId());
         assertEquals(expectedOrderDish.getAmount(), actualOrder.get(0).getAmount());
 
     }

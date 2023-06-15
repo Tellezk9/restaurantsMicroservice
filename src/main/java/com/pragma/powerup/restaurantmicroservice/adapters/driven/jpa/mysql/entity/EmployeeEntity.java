@@ -19,5 +19,5 @@ public class EmployeeEntity {
     private Long idEmployee;
     @ManyToOne
     @JoinColumn(name = "id_restaurant")
-    private RestaurantEntity idRestaurant;
+    private RestaurantEntity restaurantEntity;
 }

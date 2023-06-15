@@ -74,7 +74,9 @@ public class OrderService {
         List<OrderDish> orderDishList = new ArrayList<>();
 
         for (int i = 0; i < orderDishes.size(); i++){
-            orderDishList.add(new OrderDish(idOrder,orderDishes.get(i),amounts.get(i)));
+            Dish dish = new Dish(orderDishes.get(0),null,null,null,null,null,null,null);
+            Order order = new Order(idOrder,null,null,null,null,null);
+            orderDishList.add(new OrderDish(order,dish,amounts.get(i)));
         }
         return orderDishList;
     }

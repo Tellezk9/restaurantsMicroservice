@@ -1,10 +1,9 @@
 package com.pragma.powerup.restaurantmicroservice.domain.usecase;
 
 import com.pragma.powerup.restaurantmicroservice.domain.auth.IPrincipalUser;
-import com.pragma.powerup.restaurantmicroservice.domain.model.Dish;
-import com.pragma.powerup.restaurantmicroservice.domain.model.Order;
-import com.pragma.powerup.restaurantmicroservice.domain.model.Restaurant;
+import com.pragma.powerup.restaurantmicroservice.domain.model.*;
 import com.pragma.powerup.restaurantmicroservice.domain.spi.IDishPersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.IEmployeePersistencePort;
 import com.pragma.powerup.restaurantmicroservice.domain.spi.IOrderDishPersistencePort;
 import com.pragma.powerup.restaurantmicroservice.domain.spi.IOrderPersistencePort;
 import org.junit.jupiter.api.Test;
@@ -27,6 +26,8 @@ class OrderUseCaseTest {
     private IOrderDishPersistencePort orderDishPersistencePort;
     @Mock
     private IDishPersistencePort dishPersistencePort;
+    @Mock
+    private IEmployeePersistencePort employeePersistencePort;
     @Mock
     private IPrincipalUser authUser;
     @InjectMocks
@@ -56,5 +57,47 @@ class OrderUseCaseTest {
         verify(orderPersistencePort, times(1)).saveOrderInformation(Mockito.any(Order.class));
         verify(orderPersistencePort, times(1)).findOrderInformation(Mockito.any(Order.class));
         verify(orderDishPersistencePort, times(1)).saveOrderDish(Mockito.any());
+    }
+
+    @Test
+    void getOrders() {
+        Long status = 1L;
+        Long idRestaurant = 1L;
+        Long idUser = 1L;
+        Integer page = 1;
+        String role = "ROLE_EMPLOYEE";
+        Employee employee = new Employee(null, idUser, null);
+        Restaurant restaurant = new Restaurant(idRestaurant, null, null, null, null, null, null);
+        List<Order> orderList = List.of(new Order(null, idUser, null, status, null, restaurant));
+
+        when(authUser.getIdUser()).thenReturn(idUser);
+        when(authUser.getRole()).thenReturn(role);
+        when(employeePersistencePort.getEmployeeByIdEmployeeAndIdRestaurant(idUser, idRestaurant)).thenReturn(employee);
+        when(orderPersistencePort.getOrdersPageable(status, idRestaurant, page)).thenReturn(orderList);
+
+        orderUseCase.getOrders(status, idRestaurant, page);
+
+        verify(employeePersistencePort, times(1)).getEmployeeByIdEmployeeAndIdRestaurant(idUser, idRestaurant);
+        verify(orderPersistencePort, times(1)).getOrdersPageable(status, idRestaurant, page);
+    }
+
+    @Test
+    void getOrderDishes() {
+        Long idOrder = 1L;
+        String nameDish = "testDish";
+        String role = "ROLE_EMPLOYEE";
+        Integer amount = 1;
+
+        Order order = new Order(idOrder, null, null, null, null, null);
+        Dish dish = new Dish(1L, nameDish, null, null, null, null, null, null);
+        List<OrderDish> orderDishList = List.of(new OrderDish(order, dish, amount));
+
+        when(authUser.getRole()).thenReturn(role);
+        when(orderDishPersistencePort.getOrderDishes(idOrder)).thenReturn(orderDishList);
+
+        orderUseCase.getOrderDishes(idOrder);
+
+        verify(orderDishPersistencePort, times(1)).getOrderDishes(idOrder);
+
     }
 }
