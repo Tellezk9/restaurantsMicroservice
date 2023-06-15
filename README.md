@@ -1,4 +1,4 @@
-<br />
+<br /><
 <div align="center">
 <h3 align="center">PRAGMA POWER-UP</h3>
   <p align="center">
@@ -12,6 +12,7 @@
 * ![Spring](https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
 * ![Gradle](https://img.shields.io/badge/Gradle-02303A.svg?style=for-the-badge&logo=Gradle&logoColor=white)
 * ![MySQL](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)
+* ![OpenAPI](https://img.shields.io/badge/OpenAPI-<COLOR>?style=for-the-badge&logo=OpenAPI%20Initiative&logoColor=white)
 
 
 <!-- GETTING STARTED -->
@@ -52,7 +53,7 @@ To get a local copy up and running follow these steps.
 <!-- USAGE -->
 ## Usage
 
-1. Right-click the class PowerUpApplication and choose Run
+1. Right-click the class RestaurantMicroserviceApplication and choose Run
 2. You must run the User Microservice project
 3. Open [http://localhost:8091/swagger-ui/index.html](http://localhost:8091/swagger-ui/index.html) in your web browser
 
