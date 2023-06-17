@@ -1,5 +1,7 @@
 package com.pragma.powerup.restaurantmicroservice.configuration.security;
 
+import com.pragma.powerup.restaurantmicroservice.configuration.Constants;
+
 public class TokenUtilsImpl {
     public boolean validateRolePaths(String role, String path) {
         String[] adminPath = {"/restaurant"};
@@ -9,16 +11,16 @@ public class TokenUtilsImpl {
         boolean result = false;
 
         switch (role) {
-            case ("ROLE_OWNER"):
+            case (Constants.OWNER_ROLE_NAME):
                 result = validatePath(path, ownerPath);
                 break;
-            case ("ROLE_ADMIN"):
+            case (Constants.ADMIN_ROLE_NAME):
                 result = validatePath(path, adminPath);
                 break;
-            case ("ROLE_CLIENT"):
+            case (Constants.CLIENT_ROLE_NAME):
                 result = validatePath(path, clientPath);
                 break;
-            case ("ROLE_EMPLOYEE"):
+            case (Constants.EMPLOYEE_ROLE_NAME):
                 result = validatePath(path, employeePath);
                 break;
             default:

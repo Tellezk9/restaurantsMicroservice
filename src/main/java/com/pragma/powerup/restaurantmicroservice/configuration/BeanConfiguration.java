@@ -4,6 +4,7 @@ import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.adapt
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.mappers.*;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.repositories.*;
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.adapter.HttpAdapterImpl;
+import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.handlers.IClientHandler;
 import com.pragma.powerup.restaurantmicroservice.configuration.security.TokenHolder;
 import com.pragma.powerup.restaurantmicroservice.domain.api.IDishServicePort;
 import com.pragma.powerup.restaurantmicroservice.domain.api.IOrderServicePort;
@@ -32,6 +33,7 @@ public class BeanConfiguration {
     private final IOrderEntityMapper orderEntityMapper;
     private final IOrderDishRepository orderDishRepository;
     private final IOrderDishEntityMapper orderDishEntityMapper;
+    private final IClientHandler clientHandler;
     private final TokenHolder tokenHolder;
 
     @Bean
@@ -66,12 +68,12 @@ public class BeanConfiguration {
 
     @Bean
     public IHttpAdapter httpAdapter() {
-        return new HttpAdapterImpl(restTemplate());
+        return new HttpAdapterImpl(restTemplate(), clientHandler);
     }
 
     @Bean
     public IOrderServicePort orderServicePort() {
-        return new OrderUseCase(orderPersistencePort(), dishPersistencePort(), orderDishPersistencePort(), employeePersistencePort(), tokenHolder);
+        return new OrderUseCase(orderPersistencePort(), dishPersistencePort(), orderDishPersistencePort(), employeePersistencePort(), tokenHolder, httpAdapter());
     }
 
     @Bean

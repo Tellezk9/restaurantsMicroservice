@@ -22,3 +22,4 @@ management:
 app:
   urls:
     urlToUserMicroService: "http://localhost:8090/"
+    urlToMessagingMicroService: "http://localhost:8092/"

@@ -33,13 +33,13 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     public void saveRestaurant(Restaurant restaurant) {
         validator.hasRoleValid(authUser.getRole(), Constants.ADMIN_ROLE_NAME);
 
-        httpAdapter.getOwner(restaurant.getIdOwner(), authUser.getToken());
-
         restaurantService.allFieldsFilled(restaurant);
         restaurantService.isRestaurantNameValid(restaurant.getName());
 
         validator.isValidPhone(restaurant.getPhone());
         validator.isValidUrl(restaurant.getUrlLogo());
+
+        httpAdapter.getOwner(restaurant.getIdOwner(), authUser.getToken());
 
         restaurantPersistencePort.saveRestaurant(restaurant);
     }
