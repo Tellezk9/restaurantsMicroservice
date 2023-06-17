@@ -3,6 +3,8 @@ package com.pragma.powerup.restaurantmicroservice.domain.usecase;
 import com.pragma.powerup.restaurantmicroservice.configuration.Constants;
 import com.pragma.powerup.restaurantmicroservice.domain.api.IOrderServicePort;
 import com.pragma.powerup.restaurantmicroservice.domain.auth.IPrincipalUser;
+import com.pragma.powerup.restaurantmicroservice.domain.geteway.IHttpAdapter;
+import com.pragma.powerup.restaurantmicroservice.domain.model.Client;
 import com.pragma.powerup.restaurantmicroservice.domain.model.Dish;
 import com.pragma.powerup.restaurantmicroservice.domain.model.Order;
 import com.pragma.powerup.restaurantmicroservice.domain.model.OrderDish;
@@ -22,18 +24,19 @@ public class OrderUseCase implements IOrderServicePort {
     private final IDishPersistencePort dishPersistencePort;
     private final IEmployeePersistencePort employeePersistencePort;
     private final IPrincipalUser authUser;
+    private final IHttpAdapter httpAdapter;
     private final Validator validator;
     private final OrderService orderService;
 
-    public OrderUseCase(IOrderPersistencePort orderPersistencePort, IDishPersistencePort dishPersistencePort, IOrderDishPersistencePort orderDishPersistencePort, IEmployeePersistencePort employeePersistencePort, IPrincipalUser authUser) {
+    public OrderUseCase(IOrderPersistencePort orderPersistencePort, IDishPersistencePort dishPersistencePort, IOrderDishPersistencePort orderDishPersistencePort, IEmployeePersistencePort employeePersistencePort, IPrincipalUser authUser, IHttpAdapter httpAdapter) {
         this.orderPersistencePort = orderPersistencePort;
         this.orderDishPersistencePort = orderDishPersistencePort;
         this.dishPersistencePort = dishPersistencePort;
         this.employeePersistencePort = employeePersistencePort;
         this.authUser = authUser;
+        this.httpAdapter = httpAdapter;
         this.validator = new Validator();
         this.orderService = new OrderService();
-
     }
 
     @Override
@@ -80,7 +83,7 @@ public class OrderUseCase implements IOrderServicePort {
         validator.isIdValid(Integer.valueOf(String.valueOf(idOrder)));
 
         Order order = orderPersistencePort.getOrder(idOrder);
-        employeePersistencePort.getEmployeeByIdEmployeeAndIdRestaurant(authUser.getIdUser(),order.getRestaurant().getId());
+        employeePersistencePort.getEmployeeByIdEmployeeAndIdRestaurant(authUser.getIdUser(), order.getRestaurant().getId());
 
         orderPersistencePort.assignOrder(idOrder, authUser.getIdUser(), Constants.ORDER_STATUS_PREPARING);
     }
@@ -94,8 +97,20 @@ public class OrderUseCase implements IOrderServicePort {
         orderService.isValidStatus(status);
 
         Order order = orderPersistencePort.getOrder(idOrder);
-        employeePersistencePort.getEmployeeByIdEmployeeAndIdRestaurant(authUser.getIdUser(),order.getRestaurant().getId());
+        employeePersistencePort.getEmployeeByIdEmployeeAndIdRestaurant(authUser.getIdUser(), order.getRestaurant().getId());
 
-        orderPersistencePort.changeOrderStatus(idOrder,status);
+        if (status.equals(Constants.ORDER_STATUS_OK)) {
+            sendNotification(idOrder, order.getIdClient());
+        }
+        orderPersistencePort.changeOrderStatus(idOrder, status);
+    }
+
+    public void sendNotification(Long idOrder, Long idClient) {
+        validator.hasRoleValid(authUser.getRole(), Constants.EMPLOYEE_ROLE_NAME);
+
+        Client client = httpAdapter.getClient(idClient, authUser.getToken());
+        client.setIdOrder(idOrder);
+
+        httpAdapter.sendNotification(client, authUser.getToken());
     }
 }

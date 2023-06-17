@@ -2,6 +2,7 @@ package com.pragma.powerup.restaurantmicroservice.domain.usecase;
 
 import com.pragma.powerup.restaurantmicroservice.configuration.Constants;
 import com.pragma.powerup.restaurantmicroservice.domain.auth.IPrincipalUser;
+import com.pragma.powerup.restaurantmicroservice.domain.geteway.IHttpAdapter;
 import com.pragma.powerup.restaurantmicroservice.domain.model.*;
 import com.pragma.powerup.restaurantmicroservice.domain.spi.IDishPersistencePort;
 import com.pragma.powerup.restaurantmicroservice.domain.spi.IEmployeePersistencePort;
@@ -29,6 +30,8 @@ class OrderUseCaseTest {
     private IDishPersistencePort dishPersistencePort;
     @Mock
     private IEmployeePersistencePort employeePersistencePort;
+    @Mock
+    private IHttpAdapter httpAdapter;
     @Mock
     private IPrincipalUser authUser;
     @InjectMocks
@@ -123,10 +126,11 @@ class OrderUseCaseTest {
         verify(orderPersistencePort, times(1)).assignOrder(idOrder, idUser, Constants.ORDER_STATUS_PREPARING);
         verify(employeePersistencePort, times(1)).getEmployeeByIdEmployeeAndIdRestaurant(idUser, order.getRestaurant().getId());
     }
+
     @Test
     void changeOrderStatus() {
         Long idOrder = 1L;
-        Long status = 1L;
+        Long status = 2L;
         Long idUser = 1L;
         String role = "ROLE_EMPLOYEE";
 
@@ -138,12 +142,32 @@ class OrderUseCaseTest {
         when(authUser.getRole()).thenReturn(role);
         when(orderPersistencePort.getOrder(idOrder)).thenReturn(order);
         when(employeePersistencePort.getEmployeeByIdEmployeeAndIdRestaurant(idUser, order.getRestaurant().getId())).thenReturn(employee);
-        doNothing().when(orderPersistencePort).changeOrderStatus(idOrder,status);
+        doNothing().when(orderPersistencePort).changeOrderStatus(idOrder, status);
 
-        orderUseCase.changeOrderStatus(idOrder,status);
+        orderUseCase.changeOrderStatus(idOrder, status);
 
         verify(orderPersistencePort, times(1)).getOrder(idOrder);
-        verify(orderPersistencePort, times(1)).changeOrderStatus(idOrder,status);
+        verify(orderPersistencePort, times(1)).changeOrderStatus(idOrder, status);
         verify(employeePersistencePort, times(1)).getEmployeeByIdEmployeeAndIdRestaurant(idUser, order.getRestaurant().getId());
+    }
+
+    @Test
+    void sendNotification() {
+        Long idOrder = 1L;
+        Long idClient = 2L;
+        String token = "TestToken";
+        String role = "ROLE_EMPLOYEE";
+
+        Client client = new Client(idClient, idOrder, "testName", "testLastName", 1234, "+1234567891", "2000/05/01", "test@email.com");
+
+        when(httpAdapter.getClient(idClient, token)).thenReturn(client);
+        when(authUser.getToken()).thenReturn(token);
+        when(authUser.getRole()).thenReturn(role);
+        doNothing().when(httpAdapter).sendNotification(client, token);
+
+        orderUseCase.sendNotification(idOrder, idClient);
+
+        verify(httpAdapter,times(1)).getClient(idClient,token);
+        verify(httpAdapter,times(1)).sendNotification(client, token);
     }
 }

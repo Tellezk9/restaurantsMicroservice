@@ -77,7 +77,7 @@ class ValidatorTest {
     }
 
     @Test
-    @DisplayName("when the date is empty")
+    @DisplayName("when the mail is empty")
     void isEmptyMail() {
         assertThrows(EmptyFieldFoundException.class, () -> validator.isValidMail(""));
     }
