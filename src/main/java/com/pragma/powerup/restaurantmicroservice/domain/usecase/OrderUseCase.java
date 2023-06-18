@@ -36,7 +36,6 @@ public class OrderUseCase implements IOrderServicePort {
         this.orderService = new OrderService();
     }
 
-    @Override
     public void saveOrder(Long idRestaurant, List<Long> orderDishes, List<Integer> amountDishes) {
         validator.isIdValid(Integer.valueOf(String.valueOf(idRestaurant)));
         orderService.isOrderDishesAndAmountDishesValid(orderDishes, amountDishes);
@@ -56,7 +55,6 @@ public class OrderUseCase implements IOrderServicePort {
         orderDishPersistencePort.saveOrderDish(orderDishList);
     }
 
-    @Override
     public List<Order> getOrders(Long status, Long idRestaurant, Integer page) {
         validator.hasRoleValid(authUser.getRole(), Constants.EMPLOYEE_ROLE_NAME);
         validator.isIdValid(Integer.valueOf(String.valueOf(status)));
@@ -67,7 +65,6 @@ public class OrderUseCase implements IOrderServicePort {
         return orderPersistencePort.getOrdersPageable(status, idRestaurant, page);
     }
 
-    @Override
     public List<OrderDish> getOrderDishes(Long idOrder) {
         validator.hasRoleValid(authUser.getRole(), Constants.EMPLOYEE_ROLE_NAME);
         validator.isIdValid(Integer.valueOf(String.valueOf(idOrder)));
@@ -75,7 +72,6 @@ public class OrderUseCase implements IOrderServicePort {
         return orderDishPersistencePort.getOrderDishes(idOrder);
     }
 
-    @Override
     public void assignOrder(Long idOrder) {
         validator.hasRoleValid(authUser.getRole(), Constants.EMPLOYEE_ROLE_NAME);
         validator.isIdValid(Integer.valueOf(String.valueOf(idOrder)));
@@ -86,7 +82,6 @@ public class OrderUseCase implements IOrderServicePort {
         orderPersistencePort.assignOrder(idOrder, authUser.getIdUser(), Constants.ORDER_STATUS_PREPARING);
     }
 
-    @Override
     public void changeOrderStatus(Long idOrder, Long status) {
         validator.hasRoleValid(authUser.getRole(), Constants.EMPLOYEE_ROLE_NAME);
         validator.isIdValid(Integer.valueOf(String.valueOf(idOrder)));
@@ -103,7 +98,6 @@ public class OrderUseCase implements IOrderServicePort {
         orderPersistencePort.changeOrderStatus(idOrder, status);
     }
 
-    @Override
     public void deliverOrder(Long securityCode) {
         validator.hasRoleValid(authUser.getRole(), Constants.EMPLOYEE_ROLE_NAME);
         validator.isIdValid(Integer.valueOf(String.valueOf(securityCode)));
@@ -111,6 +105,13 @@ public class OrderUseCase implements IOrderServicePort {
         Employee employee = employeePersistencePort.getEmployeeById(authUser.getIdUser());
 
         orderPersistencePort.deliverOrder(securityCode, employee.getIdRestaurant().getId(),Constants.ORDER_STATUS_DELIVERED);
+    }
+
+    public void cancelOrder(Long idOrder) {
+        validator.hasRoleValid(authUser.getRole(), Constants.CLIENT_ROLE_NAME);
+        validator.isIdValid(Integer.valueOf(String.valueOf(idOrder)));
+
+        orderPersistencePort.cancelOrder(idOrder,authUser.getIdUser(),Constants.ORDER_STATUS_CANCELED);
     }
 
     public void sendNotification(Order order) {

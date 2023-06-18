@@ -221,5 +221,11 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, INVALID_ORDER_STATUS_MESSAGE));
     }
+    @ExceptionHandler(OrderCannotBeCanceledException.class)
+    public ResponseEntity<Map<String, String>> orderCannotBeCanceledException(
+            OrderCannotBeCanceledException orderCannotBeCanceledException) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, ORDER_CANNOT_BE_CANCELED_MESSAGE));
+    }
 
 }

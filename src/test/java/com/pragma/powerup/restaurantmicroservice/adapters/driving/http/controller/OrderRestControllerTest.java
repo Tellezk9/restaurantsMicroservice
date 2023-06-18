@@ -142,4 +142,19 @@ class OrderRestControllerTest {
 
         verify(orderHandler,times(1)).deliverOrder(securityCode);
     }
+
+    @Test
+    void cancelOrder() throws Exception {
+        Long idOrder = 1L;
+        doNothing().when(orderHandler).cancelOrder(idOrder);
+
+        mockMvc.perform(put("/order/cancelOrder")
+                        .param("idOrder",String.valueOf(idOrder))
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(Constants.ORDER_CANCELED_MESSAGE));
+
+        verify(orderHandler,times(1)).cancelOrder(idOrder);
+    }
 }

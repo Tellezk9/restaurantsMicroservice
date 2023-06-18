@@ -7,7 +7,7 @@ public class TokenUtilsImpl {
         String[] adminPath = {"/restaurant"};
         String[] ownerPath = {"/dish","/restaurant/","/employee"};
         String[] employeePath = {"/getOrders","/getOrderDish","/assignOrder/","/changeOrderStatus","/deliverOrder"};
-        String[] clientPath = {"/restaurant/","/getDishes","/order"};
+        String[] clientPath = {"/restaurant/","/getDishes","/order","/cancelOrder"};
         boolean result = false;
 
         switch (role) {
