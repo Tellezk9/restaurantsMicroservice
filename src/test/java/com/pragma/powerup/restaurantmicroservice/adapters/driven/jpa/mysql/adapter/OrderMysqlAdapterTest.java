@@ -3,6 +3,7 @@ package com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.adap
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.entity.OrderEntity;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.entity.RestaurantEntity;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.exceptions.ClientHasPendingOrderException;
+import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.exceptions.OrderCannotBeCanceledException;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.exceptions.OrderNotFoundException;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.mappers.IOrderEntityMapper;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.repositories.IOrderRepository;
@@ -195,8 +196,50 @@ class OrderMysqlAdapterTest {
 
         when(orderRepository.findBySecurityPinAndRestaurantEntityIdAndStatus(securityPin, idRestaurant, statusOk)).thenReturn(Optional.empty());
 
-        assertThrows(OrderNotFoundException.class, () -> orderMysqlAdapter.deliverOrder(securityPin,idRestaurant,status));
+        assertThrows(OrderNotFoundException.class, () -> orderMysqlAdapter.deliverOrder(securityPin, idRestaurant, status));
         verify(orderRepository, times(1)).findBySecurityPinAndRestaurantEntityIdAndStatus(securityPin, idRestaurant, statusOk);
     }
 
+    @Test
+    void cancelOrder() {
+        Long idOrder = 2L;
+        Long idClient = 1L;
+        Long status = 5L;
+        Long statusPending = 2L;
+
+        OrderEntity orderEntity = new OrderEntity(null, null, null, statusPending, null, null, null);
+
+        when(orderRepository.findByIdAndIdClient(idOrder, idClient)).thenReturn(Optional.of(orderEntity));
+
+        orderMysqlAdapter.cancelOrder(idOrder, idClient, status);
+
+        verify(orderRepository, times(1)).findByIdAndIdClient(idOrder, idClient);
+    }
+
+    @Test
+    void cancelOrder_Empty() {
+        Long idOrder = 2L;
+        Long idClient = 1L;
+        Long status = 5L;
+
+        when(orderRepository.findByIdAndIdClient(idOrder, idClient)).thenReturn(Optional.empty());
+
+        assertThrows(OrderNotFoundException.class, () -> orderMysqlAdapter.cancelOrder(idOrder, idClient, status));
+        verify(orderRepository, times(1)).findByIdAndIdClient(idOrder, idClient);
+    }
+
+    @Test
+    void cancelOrder_Conflict() {
+        Long idOrder = 2L;
+        Long idClient = 1L;
+        Long status = 5L;
+        Long statusOk = 1L;
+
+        OrderEntity orderEntity = new OrderEntity(idOrder, null, null, statusOk, null, null, null);
+
+        when(orderRepository.findByIdAndIdClient(idOrder, idClient)).thenReturn(Optional.of(orderEntity));
+
+        assertThrows(OrderCannotBeCanceledException.class, () -> orderMysqlAdapter.cancelOrder(idOrder, idClient, status));
+        verify(orderRepository, times(1)).findByIdAndIdClient(idOrder, idClient);
+    }
 }

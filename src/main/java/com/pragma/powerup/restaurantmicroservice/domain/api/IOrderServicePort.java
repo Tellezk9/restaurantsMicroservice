@@ -12,4 +12,5 @@ public interface IOrderServicePort {
     void assignOrder(Long idOrder);
     void changeOrderStatus(Long idOrder, Long status);
     void deliverOrder(Long securityCode);
+    void cancelOrder(Long idOrder);
 }

@@ -194,4 +194,19 @@ class OrderUseCaseTest {
         verify(employeePersistencePort, times(1)).getEmployeeById(idUser);
     }
 
+    @Test
+    void cancelOrder() {
+        Long idOrder = 1L;
+        Long status = 5L;
+        Long idUser = 1L;
+        String role = "ROLE_CLIENT";
+
+        when(authUser.getIdUser()).thenReturn(idUser);
+        when(authUser.getRole()).thenReturn(role);
+        doNothing().when(orderPersistencePort).cancelOrder(idOrder, idOrder, status);
+
+        orderUseCase.cancelOrder(idOrder);
+
+        verify(orderPersistencePort, times(1)).cancelOrder(idOrder, idOrder, status);
+    }
 }

@@ -111,4 +111,15 @@ class OrderHandlerImplTest {
 
         verify(orderServicePort, times(1)).deliverOrder(securityCode);
     }
+
+    @Test
+    void cancelOrder() {
+        Long idOrder = 1L;
+
+        doNothing().when(orderServicePort).cancelOrder(idOrder);
+
+        orderHandler.cancelOrder(idOrder);
+
+        verify(orderServicePort, times(1)).cancelOrder(idOrder);
+    }
 }
