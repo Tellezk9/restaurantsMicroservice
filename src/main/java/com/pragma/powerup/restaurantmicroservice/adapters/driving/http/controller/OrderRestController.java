@@ -95,4 +95,18 @@ public class OrderRestController {
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_STATUS_CHANGED_MESSAGE));
     }
+    @Operation(summary = "Deliver an order",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Order delivered successfully",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Map"))),
+                    @ApiResponse(responseCode = "409", description = "Error to make the process",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Map"))),
+                    @ApiResponse(responseCode = "403", description = "Role not allowed for change order status",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
+    @PutMapping("/deliverOrder")
+    public ResponseEntity<Map<String, String>> deliverOrder(@RequestParam Long securityCode) {
+        orderHandler.deliverOrder(securityCode);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_DELIVERED_MESSAGE));
+    }
 }

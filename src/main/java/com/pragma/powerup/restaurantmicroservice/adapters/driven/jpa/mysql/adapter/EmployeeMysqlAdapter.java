@@ -3,6 +3,7 @@ package com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.adap
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.entity.EmployeeEntity;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.exceptions.EmployeeAlreadyAssignedException;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.exceptions.EmployeeDoesNotBelongRestaurantException;
+import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.exceptions.UserNotFoundException;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.mappers.IEmployeeEntityMapper;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.repositories.IEmployeeRepository;
 import com.pragma.powerup.restaurantmicroservice.domain.model.Employee;
@@ -31,8 +32,18 @@ public class EmployeeMysqlAdapter implements IEmployeePersistencePort {
     public Employee getEmployeeByIdEmployeeAndIdRestaurant(Long idEmployee, Long idRestaurant) {
         Optional<EmployeeEntity> employeeEntity = employeeRepository.findByIdEmployeeAndRestaurantEntityId(idEmployee,idRestaurant);
 
-        if (!employeeEntity.isPresent()){
+        if (employeeEntity.isEmpty()){
             throw new EmployeeDoesNotBelongRestaurantException();
+        }
+        return employeeEntityMapper.toEmployee(employeeEntity.get());
+    }
+
+    @Override
+    public Employee getEmployeeById(Long idEmployee) {
+        Optional<EmployeeEntity> employeeEntity = employeeRepository.findByIdEmployee(idEmployee);
+
+        if (employeeEntity.isEmpty()){
+            throw new UserNotFoundException();
         }
         return employeeEntityMapper.toEmployee(employeeEntity.get());
     }

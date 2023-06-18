@@ -74,7 +74,7 @@ public class ControllerAdvisor {
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleUserNotFoundException(
             UserNotFoundException userNotFoundException) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, USER_NOT_FOUND_MESSAGE));
     }
     @ExceptionHandler(RoleNotFoundException.class)
@@ -214,6 +214,12 @@ public class ControllerAdvisor {
             InvalidStatusException invalidStatusException) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, INVALID_STATUS_MESSAGE));
+    }
+    @ExceptionHandler(InvalidOrderStatusException.class)
+    public ResponseEntity<Map<String, String>> invalidOrderStatusException(
+            InvalidOrderStatusException invalidOrderStatusException) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, INVALID_ORDER_STATUS_MESSAGE));
     }
 
 }

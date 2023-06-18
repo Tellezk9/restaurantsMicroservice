@@ -82,7 +82,6 @@ class OrderRestControllerTest {
                 .andExpect(jsonPath("$[0]idRestaurant").value(orderResponseDtoList.get(0).getIdRestaurant()));
     }
 
-
     @Test
     void getOrderDishes() throws Exception {
         Long idOrder = 1L;
@@ -127,5 +126,20 @@ class OrderRestControllerTest {
                 .andExpect(jsonPath("$.message").value(Constants.ORDER_STATUS_CHANGED_MESSAGE));
 
         verify(orderHandler,times(1)).changeOrderStatus(idOrder,status);
+    }
+
+    @Test
+    void deliverOrder() throws Exception {
+        Long securityCode = 1L;
+        doNothing().when(orderHandler).deliverOrder(securityCode);
+
+        mockMvc.perform(put("/order/deliverOrder")
+                        .param("securityCode",String.valueOf(securityCode))
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(Constants.ORDER_DELIVERED_MESSAGE));
+
+        verify(orderHandler,times(1)).deliverOrder(securityCode);
     }
 }

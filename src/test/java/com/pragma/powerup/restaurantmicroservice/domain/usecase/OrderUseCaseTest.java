@@ -159,7 +159,7 @@ class OrderUseCaseTest {
         String token = "TestToken";
         String role = "ROLE_EMPLOYEE";
 
-        Order order = new Order(idOrder,idClient,null,null,null,securityPin,null);
+        Order order = new Order(idOrder, idClient, null, null, null, securityPin, null);
         Client client = new Client(idClient, idOrder, "testName", "testLastName", 1234, "+1234567891", "2000/05/01", "test@email.com");
 
         when(httpAdapter.getClient(idClient, token)).thenReturn(client);
@@ -172,4 +172,26 @@ class OrderUseCaseTest {
         verify(httpAdapter, times(1)).getClient(idClient, token);
         verify(httpAdapter, times(1)).sendNotification(client, token);
     }
+
+    @Test
+    void deliverOrder() {
+        Long securityCode = 1L;
+        Long status = 4L;
+        Long idUser = 1L;
+        String role = "ROLE_EMPLOYEE";
+
+        Restaurant restaurant = new Restaurant(1L, null, null, null, null, null, null);
+        Employee employee = new Employee(1L, idUser, restaurant);
+
+        when(authUser.getIdUser()).thenReturn(idUser);
+        when(authUser.getRole()).thenReturn(role);
+        when(employeePersistencePort.getEmployeeById(idUser)).thenReturn(employee);
+        doNothing().when(orderPersistencePort).deliverOrder(securityCode, employee.getIdRestaurant().getId(), status);
+
+        orderUseCase.deliverOrder(securityCode);
+
+        verify(orderPersistencePort, times(1)).deliverOrder(securityCode, employee.getIdRestaurant().getId(), status);
+        verify(employeePersistencePort, times(1)).getEmployeeById(idUser);
+    }
+
 }

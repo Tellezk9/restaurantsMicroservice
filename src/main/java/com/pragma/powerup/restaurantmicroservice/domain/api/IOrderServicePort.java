@@ -11,4 +11,5 @@ public interface IOrderServicePort {
     List<OrderDish> getOrderDishes(Long idOrder);
     void assignOrder(Long idOrder);
     void changeOrderStatus(Long idOrder, Long status);
+    void deliverOrder(Long securityCode);
 }
