@@ -8,14 +8,16 @@ public class Order {
     private Date date;
     private Long status;
     private Long idChef;
+    private Long securityPin;
     private Restaurant restaurant;
 
-    public Order(Long id, Long idClient, Date date, Long status, Long idChef, Restaurant restaurant) {
+    public Order(Long id, Long idClient, Date date, Long status, Long idChef, Long securityPin, Restaurant restaurant) {
         this.id = id;
         this.idClient = idClient;
         this.date = date;
         this.status = status;
         this.idChef = idChef;
+        this.securityPin = securityPin;
         this.restaurant = restaurant;
     }
 
@@ -59,6 +61,14 @@ public class Order {
         this.idChef = idChef;
     }
 
+    public Long getSecurityPin() {
+        return securityPin;
+    }
+
+    public void setSecurityPin(Long securityPin) {
+        this.securityPin = securityPin;
+    }
+
     public Restaurant getRestaurant() {
         return restaurant;
     }
@@ -66,5 +76,4 @@ public class Order {
     public void setRestaurant(Restaurant restaurant) {
         this.restaurant = restaurant;
     }
-
 }

@@ -37,11 +37,11 @@ class OrderDishMysqlAdapterTest {
         Long idOrder = 1L;
         Long orderDish = 1L;
         Integer amount = 1;
-        Order order = new Order(idOrder,null,null,null,null,null);
+        Order order = new Order(idOrder,null,null,null,null,null,null);
         Dish dish = new Dish(orderDish,null,null,null,null,null,null,null);
         List<OrderDish> orderDishList = List.of(new OrderDish(order, dish, amount));
 
-        OrderEntity orderEntity = new OrderEntity(idOrder,null,null,null,null,null);
+        OrderEntity orderEntity = new OrderEntity(idOrder,null,null,null,null,null,null);
         DishEntity dishEntity = new DishEntity(orderDish,null,null,null,null,null,null,null);
         List<OrderDishEntity> orderDishEntities = List.of(new OrderDishEntity(null, amount, orderEntity, dishEntity));
 
@@ -61,7 +61,7 @@ class OrderDishMysqlAdapterTest {
         Integer amount = 1;
         Pageable pageable = PageRequest.of(page, Constants.MAX_PAGE_SIZE);
 
-        Order order = new Order(idOrder,null,null,null,null,null);
+        Order order = new Order(idOrder,null,null,null,null,null,null);
         Dish dish = new Dish(null,nameDish,null,null,null,null,null,null);
         List<OrderDish> orderDishList = List.of(new OrderDish(order,dish,amount));
 
@@ -97,7 +97,7 @@ class OrderDishMysqlAdapterTest {
         String nameDish = "testDish";
         Integer amount = 1;
 
-        Order order = new Order(idOrder,null,null,null,null,null);
+        Order order = new Order(idOrder,null,null,null,null,null,null);
         Dish dish = new Dish(null,nameDish,null,null,null,null,null,null);
         List<OrderDish> orderDishList = List.of(new OrderDish(order,dish,amount));
 

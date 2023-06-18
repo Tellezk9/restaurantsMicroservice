@@ -48,6 +48,7 @@ public class OrderUseCase implements IOrderServicePort {
 
         orderService.restaurantHasTheDishes(dishList, orderDishes);
 
+
         Order orderInformation = orderService.makeNewOrderInformation(authUser.getIdUser(), idRestaurant, Constants.ORDER_STATUS_PENDING);
         orderPersistencePort.saveOrderInformation(orderInformation);
 
@@ -100,16 +101,16 @@ public class OrderUseCase implements IOrderServicePort {
         employeePersistencePort.getEmployeeByIdEmployeeAndIdRestaurant(authUser.getIdUser(), order.getRestaurant().getId());
 
         if (status.equals(Constants.ORDER_STATUS_OK)) {
-            sendNotification(idOrder, order.getIdClient());
+            sendNotification(order);
         }
         orderPersistencePort.changeOrderStatus(idOrder, status);
     }
 
-    public void sendNotification(Long idOrder, Long idClient) {
+    public void sendNotification(Order order) {
         validator.hasRoleValid(authUser.getRole(), Constants.EMPLOYEE_ROLE_NAME);
 
-        Client client = httpAdapter.getClient(idClient, authUser.getToken());
-        client.setIdOrder(idOrder);
+        Client client = httpAdapter.getClient(order.getIdClient(), authUser.getToken());
+        client.setSecurityPin(order.getSecurityPin());
 
         httpAdapter.sendNotification(client, authUser.getToken());
     }
