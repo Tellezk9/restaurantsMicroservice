@@ -10,6 +10,8 @@ import com.pragma.powerup.restaurantmicroservice.domain.model.Restaurant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
+
 
 public class OrderService {
 
@@ -59,31 +61,33 @@ public class OrderService {
             throw new EmptyFieldFoundException();
         }
 
+        Random random = new Random();
+        Integer securityPin = (int) ((random.nextInt(9999) + 100) + (random.nextInt(999999) + 1000)) / 2;
+
         Date date = new Date();
         Restaurant restaurant = new Restaurant(idRestaurant, null, null, null, null, null, null);
-        return new Order(null, idUser, date, status, null, restaurant);
+        return new Order(null, idUser, date, status, null, (long) securityPin, restaurant);
     }
 
     public List<OrderDish> makeNewListOrderDish(Long idOrder, List<Long> orderDishes, List<Integer> amounts) {
         if ((idOrder == null || idOrder <= 0) || orderDishes.isEmpty() || amounts.isEmpty()) {
             throw new EmptyFieldFoundException();
         }
-
         List<OrderDish> orderDishList = new ArrayList<>();
 
-        for (int i = 0; i < orderDishes.size(); i++){
-            Dish dish = new Dish(orderDishes.get(0),null,null,null,null,null,null,null);
-            Order order = new Order(idOrder,null,null,null,null,null);
-            orderDishList.add(new OrderDish(order,dish,amounts.get(i)));
+        for (int i = 0; i < orderDishes.size(); i++) {
+            Dish dish = new Dish(orderDishes.get(0), null, null, null, null, null, null, null);
+            Order order = new Order(idOrder, null, null, null, null, null, null);
+            orderDishList.add(new OrderDish(order, dish, amounts.get(i)));
         }
         return orderDishList;
     }
 
-    public boolean isValidStatus(Long status){
-        if (status == null || status <= 0){
+    public boolean isValidStatus(Long status) {
+        if (status == null || status <= 0) {
             throw new EmptyFieldFoundException();
         }
-        if (!(status.equals(Constants.ORDER_STATUS_OK) || status.equals(Constants.ORDER_STATUS_PENDING) || status.equals(Constants.ORDER_STATUS_PREPARING))){
+        if (!(status.equals(Constants.ORDER_STATUS_OK) || status.equals(Constants.ORDER_STATUS_PENDING) || status.equals(Constants.ORDER_STATUS_PREPARING))) {
             throw new InvalidStatusException();
         }
 

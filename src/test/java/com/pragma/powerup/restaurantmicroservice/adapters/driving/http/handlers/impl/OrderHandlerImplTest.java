@@ -48,7 +48,7 @@ class OrderHandlerImplTest {
         Long idRestaurant = 1L;
         Integer page = 1;
         Restaurant restaurant = new Restaurant(idRestaurant, null, null, null, null, null, null);
-        List<Order> orderList = List.of(new Order(1L, null, null, status, null, restaurant));
+        List<Order> orderList = List.of(new Order(1L, null, null, status, null,null, restaurant));
         List<OrderResponseDto> orderResponseDtoList = List.of(new OrderResponseDto(null, null, null, status, null, idRestaurant));
 
         when(orderServicePort.getOrders(status, idRestaurant, page)).thenReturn(orderList);
@@ -66,7 +66,7 @@ class OrderHandlerImplTest {
         String nameDish = "testDish";
         Integer amount = 1;
 
-        Order order = new Order(idOrder, null, null, null, null, null);
+        Order order = new Order(idOrder, null, null, null, null, null,null);
         Dish dish = new Dish(null, nameDish, null, null, null, null, null, null);
         List<OrderDish> orderDishList = List.of(new OrderDish(order, dish, amount));
 

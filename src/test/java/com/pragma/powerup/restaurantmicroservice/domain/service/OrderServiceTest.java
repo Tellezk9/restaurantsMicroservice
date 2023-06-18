@@ -82,7 +82,7 @@ class OrderServiceTest {
 
         Date expectedDate = new Date();
         Restaurant expectedRestaurant = new Restaurant(idRestaurant, null, null, null, null, null, null);
-        Order expectedOrder = new Order(null, idUser, expectedDate, status, null, expectedRestaurant);
+        Order expectedOrder = new Order(null, idUser, expectedDate, status, null,null, expectedRestaurant);
 
         Order actualOrder = orderService.makeNewOrderInformation(idUser, idRestaurant, status);
 
@@ -101,7 +101,7 @@ class OrderServiceTest {
         Long idOrder = 1L;
         List<Long> orderDishes = List.of(1L);
         List<Integer> amountDishes = List.of(1);
-        Order order = new Order(idOrder, null, null, null, null, null);
+        Order order = new Order(idOrder, null, null, null, null, null,null);
         Dish dish = new Dish(orderDishes.get(0), null, null, null, null, null, null, null);
         List<OrderDish> orderDishList = List.of(new OrderDish(order, dish, amountDishes.get(0)));
         OrderDish expectedOrderDish = orderDishList.get(0);

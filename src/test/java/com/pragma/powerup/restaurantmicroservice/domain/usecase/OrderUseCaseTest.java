@@ -46,7 +46,7 @@ class OrderUseCaseTest {
 
         List<Dish> dishList = List.of(new Dish(1L, null, null, null, null, null, null, null));
         Restaurant restaurant = new Restaurant(1L, null, null, null, null, null, null);
-        Order order = new Order(1L, 1L, null, 2L, null, restaurant);
+        Order order = new Order(1L, 1L, null, 2L, null, null, restaurant);
 
         when(dishPersistencePort.getDishesByRestaurantId(idRestaurant)).thenReturn(dishList);
 
@@ -72,7 +72,7 @@ class OrderUseCaseTest {
         String role = "ROLE_EMPLOYEE";
         Employee employee = new Employee(null, idUser, null);
         Restaurant restaurant = new Restaurant(idRestaurant, null, null, null, null, null, null);
-        List<Order> orderList = List.of(new Order(null, idUser, null, status, null, restaurant));
+        List<Order> orderList = List.of(new Order(null, idUser, null, status, null, null, restaurant));
 
         when(authUser.getIdUser()).thenReturn(idUser);
         when(authUser.getRole()).thenReturn(role);
@@ -92,7 +92,7 @@ class OrderUseCaseTest {
         String role = "ROLE_EMPLOYEE";
         Integer amount = 1;
 
-        Order order = new Order(idOrder, null, null, null, null, null);
+        Order order = new Order(idOrder, null, null, null, null, null, null);
         Dish dish = new Dish(1L, nameDish, null, null, null, null, null, null);
         List<OrderDish> orderDishList = List.of(new OrderDish(order, dish, amount));
 
@@ -111,7 +111,7 @@ class OrderUseCaseTest {
         String role = "ROLE_EMPLOYEE";
 
         Restaurant restaurant = new Restaurant(1L, null, null, null, null, null, null);
-        Order order = new Order(idOrder, null, null, null, idUser, restaurant);
+        Order order = new Order(idOrder, null, null, null, idUser, null, restaurant);
         Employee employee = new Employee(1L, idUser, restaurant);
 
         when(authUser.getIdUser()).thenReturn(idUser);
@@ -135,7 +135,7 @@ class OrderUseCaseTest {
         String role = "ROLE_EMPLOYEE";
 
         Restaurant restaurant = new Restaurant(1L, null, null, null, null, null, null);
-        Order order = new Order(idOrder, null, null, null, idUser, restaurant);
+        Order order = new Order(idOrder, null, null, null, idUser, null, restaurant);
         Employee employee = new Employee(1L, idUser, restaurant);
 
         when(authUser.getIdUser()).thenReturn(idUser);
@@ -155,9 +155,11 @@ class OrderUseCaseTest {
     void sendNotification() {
         Long idOrder = 1L;
         Long idClient = 2L;
+        Long securityPin = 221332L;
         String token = "TestToken";
         String role = "ROLE_EMPLOYEE";
 
+        Order order = new Order(idOrder,idClient,null,null,null,securityPin,null);
         Client client = new Client(idClient, idOrder, "testName", "testLastName", 1234, "+1234567891", "2000/05/01", "test@email.com");
 
         when(httpAdapter.getClient(idClient, token)).thenReturn(client);
@@ -165,9 +167,9 @@ class OrderUseCaseTest {
         when(authUser.getRole()).thenReturn(role);
         doNothing().when(httpAdapter).sendNotification(client, token);
 
-        orderUseCase.sendNotification(idOrder, idClient);
+        orderUseCase.sendNotification(order);
 
-        verify(httpAdapter,times(1)).getClient(idClient,token);
-        verify(httpAdapter,times(1)).sendNotification(client, token);
+        verify(httpAdapter, times(1)).getClient(idClient, token);
+        verify(httpAdapter, times(1)).sendNotification(client, token);
     }
 }
