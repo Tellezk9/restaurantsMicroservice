@@ -12,4 +12,5 @@ public interface IOrderHandler {
     List<OrderDishResponseDto> getOrderDish(Long idOrder);
     void assignOrder(Long idOrder);
     void changeOrderStatus(Long idOrder,Long status);
+    void deliverOrder(Long securityCode);
 }

@@ -2,6 +2,7 @@ package com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.adap
 
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.entity.OrderEntity;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.exceptions.ClientHasPendingOrderException;
+import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.exceptions.InvalidOrderStatusException;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.exceptions.OrderNotFoundException;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.mappers.IOrderEntityMapper;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.repositories.IOrderRepository;
@@ -78,6 +79,19 @@ public class OrderMysqlAdapter implements IOrderPersistencePort {
     @Override
     public void changeOrderStatus(Long idOrder, Long status) {
         Optional<OrderEntity> orderEntity = orderRepository.findById(idOrder);
+        if (orderEntity.isEmpty()){
+            throw new OrderNotFoundException();
+        }
+        if (orderEntity.get().getStatus().equals(Constants.ORDER_STATUS_DELIVERED) && !status.equals(Constants.ORDER_STATUS_OK)){
+            throw new InvalidOrderStatusException();
+        }
+        orderEntity.get().setStatus(status);
+        orderRepository.save(orderEntity.get());
+    }
+
+    @Override
+    public void deliverOrder(Long securityPin, Long idRestaurant, Long status) {
+        Optional<OrderEntity> orderEntity = orderRepository.findBySecurityPinAndRestaurantEntityIdAndStatus(securityPin, idRestaurant, Constants.ORDER_STATUS_OK);
         if (orderEntity.isEmpty()){
             throw new OrderNotFoundException();
         }

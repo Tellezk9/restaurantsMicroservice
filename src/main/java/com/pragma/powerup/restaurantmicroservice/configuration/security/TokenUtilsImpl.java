@@ -6,7 +6,7 @@ public class TokenUtilsImpl {
     public boolean validateRolePaths(String role, String path) {
         String[] adminPath = {"/restaurant"};
         String[] ownerPath = {"/dish","/restaurant/","/employee"};
-        String[] employeePath = {"/getOrders","/getOrderDish","/assignOrder/","/changeOrderStatus"};
+        String[] employeePath = {"/getOrders","/getOrderDish","/assignOrder/","/changeOrderStatus","/deliverOrder"};
         String[] clientPath = {"/restaurant/","/getDishes","/order"};
         boolean result = false;
 

@@ -11,4 +11,5 @@ public interface IOrderPersistencePort {
     Order getOrder(Long idOrder);
     void assignOrder(Long idOrder,Long idEmployee, Long status);
     void changeOrderStatus(Long idOrder, Long status);
+    void deliverOrder(Long securityPin,Long idRestaurant, Long status);
 }

@@ -44,4 +44,9 @@ public class OrderHandlerImpl implements IOrderHandler {
     public void changeOrderStatus(Long idOrder, Long status) {
         orderServicePort.changeOrderStatus(idOrder, status);
     }
+
+    @Override
+    public void deliverOrder(Long securityCode) {
+        orderServicePort.deliverOrder(securityCode);
+    }
 }

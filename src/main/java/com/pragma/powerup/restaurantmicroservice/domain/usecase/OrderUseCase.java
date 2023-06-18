@@ -4,10 +4,7 @@ import com.pragma.powerup.restaurantmicroservice.configuration.Constants;
 import com.pragma.powerup.restaurantmicroservice.domain.api.IOrderServicePort;
 import com.pragma.powerup.restaurantmicroservice.domain.auth.IPrincipalUser;
 import com.pragma.powerup.restaurantmicroservice.domain.geteway.IHttpAdapter;
-import com.pragma.powerup.restaurantmicroservice.domain.model.Client;
-import com.pragma.powerup.restaurantmicroservice.domain.model.Dish;
-import com.pragma.powerup.restaurantmicroservice.domain.model.Order;
-import com.pragma.powerup.restaurantmicroservice.domain.model.OrderDish;
+import com.pragma.powerup.restaurantmicroservice.domain.model.*;
 import com.pragma.powerup.restaurantmicroservice.domain.service.OrderService;
 import com.pragma.powerup.restaurantmicroservice.domain.service.Validator;
 import com.pragma.powerup.restaurantmicroservice.domain.spi.IDishPersistencePort;
@@ -104,6 +101,16 @@ public class OrderUseCase implements IOrderServicePort {
             sendNotification(order);
         }
         orderPersistencePort.changeOrderStatus(idOrder, status);
+    }
+
+    @Override
+    public void deliverOrder(Long securityCode) {
+        validator.hasRoleValid(authUser.getRole(), Constants.EMPLOYEE_ROLE_NAME);
+        validator.isIdValid(Integer.valueOf(String.valueOf(securityCode)));
+
+        Employee employee = employeePersistencePort.getEmployeeById(authUser.getIdUser());
+
+        orderPersistencePort.deliverOrder(securityCode, employee.getIdRestaurant().getId(),Constants.ORDER_STATUS_DELIVERED);
     }
 
     public void sendNotification(Order order) {

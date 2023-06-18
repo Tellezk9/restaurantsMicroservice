@@ -35,10 +35,10 @@ class OrderMysqlAdapterTest {
     @Test
     void saveOrderInformation() {
         Restaurant restaurant = new Restaurant(1L, null, null, null, null, null, null);
-        Order order = new Order(null, 1L, null, 2L, null, null,restaurant);
+        Order order = new Order(null, 1L, null, 2L, null, null, restaurant);
 
         RestaurantEntity restaurantEntity = new RestaurantEntity(1L, null, null, null, null, null, null);
-        OrderEntity orderEntity = new OrderEntity(1L, 1L, null, 2L, null, restaurantEntity,null);
+        OrderEntity orderEntity = new OrderEntity(1L, 1L, null, 2L, null, restaurantEntity, null);
 
         when(orderRepository.findByIdClientAndRestaurantEntityIdAndStatusNot(order.getIdClient(), order.getRestaurant().getId(), Constants.ORDER_STATUS_OK)).thenReturn(Optional.empty());
         when(orderEntityMapper.toOrderEntity(order)).thenReturn(orderEntity);
@@ -51,10 +51,10 @@ class OrderMysqlAdapterTest {
     @Test
     void saveOrderInformationConflict() {
         Restaurant restaurant = new Restaurant(1L, null, null, null, null, null, null);
-        Order order = new Order(null, 1L, null, 2L, null, null,restaurant);
+        Order order = new Order(null, 1L, null, 2L, null, null, restaurant);
 
         RestaurantEntity restaurantEntity = new RestaurantEntity(1L, null, null, null, null, null, null);
-        OrderEntity orderEntity = new OrderEntity(1L, 1L, null, 2L, null, restaurantEntity,null);
+        OrderEntity orderEntity = new OrderEntity(1L, 1L, null, 2L, null, restaurantEntity, null);
 
         when(orderRepository.findByIdClientAndRestaurantEntityIdAndStatusNot(order.getIdClient(), order.getRestaurant().getId(), Constants.ORDER_STATUS_OK)).thenReturn(Optional.of(orderEntity));
 
@@ -64,10 +64,10 @@ class OrderMysqlAdapterTest {
     @Test
     void findOrderInformation() {
         Restaurant restaurant = new Restaurant(1L, null, null, null, null, null, null);
-        Order order = new Order(null, 1L, null, 2L, null, null,restaurant);
+        Order order = new Order(null, 1L, null, 2L, null, null, restaurant);
 
         RestaurantEntity restaurantEntity = new RestaurantEntity(1L, null, null, null, null, null, null);
-        OrderEntity orderEntity = new OrderEntity(1L, 1L, null, 2L, null, restaurantEntity,null);
+        OrderEntity orderEntity = new OrderEntity(1L, 1L, null, 2L, null, restaurantEntity, null);
 
         when(orderRepository.findByIdClientAndRestaurantEntityIdAndStatus(order.getIdClient(), order.getRestaurant().getId(), order.getStatus())).thenReturn(Optional.of(orderEntity));
         when(orderEntityMapper.toOrder(orderEntity)).thenReturn(order);
@@ -80,7 +80,7 @@ class OrderMysqlAdapterTest {
     @Test
     void findOrderInformationConflict() {
         Restaurant restaurant = new Restaurant(1L, null, null, null, null, null, null);
-        Order order = new Order(null, 1L, null, 2L, null, null,restaurant);
+        Order order = new Order(null, 1L, null, 2L, null, null, restaurant);
 
         when(orderRepository.findByIdClientAndRestaurantEntityIdAndStatus(order.getIdClient(), order.getRestaurant().getId(), order.getStatus())).thenReturn(Optional.empty());
 
@@ -94,7 +94,7 @@ class OrderMysqlAdapterTest {
         int page = 1;
         Pageable pageable = PageRequest.of(page, Constants.MAX_PAGE_SIZE);
         List<OrderEntity> orderEntityList = List.of(new OrderEntity());
-        List<Order> orderList = List.of(new Order(null, null, null, null, null, null,null));
+        List<Order> orderList = List.of(new Order(null, null, null, null, null, null, null));
 
         when(orderRepository.findByRestaurantEntityIdAndStatus(idRestaurant, status, pageable)).thenReturn(orderEntityList);
         when(orderEntityMapper.toOrderList(orderEntityList)).thenReturn(orderList);
@@ -124,7 +124,7 @@ class OrderMysqlAdapterTest {
         Long idEmployee = 1L;
         Long status = 1L;
 
-        OrderEntity orderEntity = new OrderEntity(idOrder, null, null, status, idEmployee,null,null);
+        OrderEntity orderEntity = new OrderEntity(idOrder, null, null, status, idEmployee, null, null);
 
         when(orderRepository.findById(idOrder)).thenReturn(Optional.of(orderEntity));
 
@@ -150,7 +150,7 @@ class OrderMysqlAdapterTest {
         Long idOrder = 1L;
         Long status = 1L;
 
-        OrderEntity orderEntity = new OrderEntity(idOrder, null, null, status, null, null,null);
+        OrderEntity orderEntity = new OrderEntity(idOrder, null, null, status, null, null, null);
 
         when(orderRepository.findById(idOrder)).thenReturn(Optional.of(orderEntity));
 
@@ -168,6 +168,35 @@ class OrderMysqlAdapterTest {
 
         assertThrows(OrderNotFoundException.class, () -> orderMysqlAdapter.changeOrderStatus(idOrder, status));
         verify(orderRepository, times(1)).findById(idOrder);
+    }
+
+    @Test
+    void deliverOrder() {
+        Long securityPin = 4213L;
+        Long idRestaurant = 1L;
+        Long status = 4L;
+        Long statusOk = 1L;
+
+        OrderEntity orderEntity = new OrderEntity(null, null, null, status, null, null, null);
+
+        when(orderRepository.findBySecurityPinAndRestaurantEntityIdAndStatus(securityPin, idRestaurant, statusOk)).thenReturn(Optional.of(orderEntity));
+
+        orderMysqlAdapter.deliverOrder(securityPin, idRestaurant, status);
+
+        verify(orderRepository, times(1)).findBySecurityPinAndRestaurantEntityIdAndStatus(securityPin, idRestaurant, statusOk);
+    }
+
+    @Test
+    void deliverOrder_Conflict() {
+        Long securityPin = 4213L;
+        Long idRestaurant = 1L;
+        Long status = 4L;
+        Long statusOk = 1L;
+
+        when(orderRepository.findBySecurityPinAndRestaurantEntityIdAndStatus(securityPin, idRestaurant, statusOk)).thenReturn(Optional.empty());
+
+        assertThrows(OrderNotFoundException.class, () -> orderMysqlAdapter.deliverOrder(securityPin,idRestaurant,status));
+        verify(orderRepository, times(1)).findBySecurityPinAndRestaurantEntityIdAndStatus(securityPin, idRestaurant, statusOk);
     }
 
 }

@@ -3,6 +3,7 @@ package com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.adap
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.entity.EmployeeEntity;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.entity.RestaurantEntity;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.exceptions.EmployeeDoesNotBelongRestaurantException;
+import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.exceptions.UserNotFoundException;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.mappers.IEmployeeEntityMapper;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.repositories.IEmployeeRepository;
 import com.pragma.powerup.restaurantmicroservice.domain.model.Employee;
@@ -86,5 +87,33 @@ class EmployeeMysqlAdapterTest {
         when(employeeRepository.findByIdEmployeeAndRestaurantEntityId(idEmployee, idRestaurant)).thenReturn(Optional.empty());
 
         assertThrows(EmployeeDoesNotBelongRestaurantException.class, () -> employeeMysqlAdapter.getEmployeeByIdEmployeeAndIdRestaurant(idEmployee, idRestaurant));
+    }
+
+
+    @Test
+    void getEmployeeById() {
+        Long idEmployee = 1L;
+
+        Restaurant restaurant = new Restaurant(null, "testName", "string", 4L, "+439094230412", "string", 123);
+        Employee employee = new Employee(null, idEmployee, restaurant);
+
+        RestaurantEntity restaurantEntity = new RestaurantEntity(null, "testName", "string", 4L, "+439094230412", "string", "1233");
+        EmployeeEntity employeeEntity = new EmployeeEntity(1L, idEmployee, restaurantEntity);
+
+        when(employeeRepository.findByIdEmployee(idEmployee)).thenReturn(Optional.of(employeeEntity));
+        when(employeeEntityMapper.toEmployee(employeeEntity)).thenReturn(employee);
+
+        employeeMysqlAdapter.getEmployeeById(idEmployee);
+
+        verify(employeeRepository, times(1)).findByIdEmployee(idEmployee);
+        verify(employeeEntityMapper, times(1)).toEmployee(employeeEntity);
+    }
+
+    @Test
+    void getEmployeeById_Conflict() {
+        Long idEmployee = 1L;
+        when(employeeRepository.findByIdEmployee(idEmployee)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> employeeMysqlAdapter.getEmployeeById(idEmployee));
     }
 }
