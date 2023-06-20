@@ -123,7 +123,7 @@ class OrderRestControllerTest {
                         .param("status",String.valueOf(status))
                 )
                 .andDo(print())
-                .andExpect(status().isAccepted())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value(Constants.ORDER_STATUS_CHANGED_MESSAGE));
 
         verify(orderHandler,times(1)).changeOrderStatus(idOrder,status);
