@@ -3,6 +3,7 @@ package com.pragma.powerup.restaurantmicroservice.adapters.driving.http.controll
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.request.OrderRequestDto;
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderDishResponseDto;
+import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderDocumentResponseDto;
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderResponseDto;
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.handlers.IOrderHandler;
 import com.pragma.powerup.restaurantmicroservice.configuration.Constants;
@@ -156,5 +157,44 @@ class OrderRestControllerTest {
                 .andExpect(jsonPath("$.message").value(Constants.ORDER_CANCELED_MESSAGE));
 
         verify(orderHandler,times(1)).cancelOrder(idOrder);
+    }
+
+    @Test
+    void getTraceabilityOrder() throws Exception {
+        Long idOrder = 1L;
+        OrderDocumentResponseDto orderDocumentResponseDto = new OrderDocumentResponseDto(1L,1L,1L,null,null,null,1L,null);
+        when(orderHandler.getTraceabilityOrder(idOrder)).thenReturn(orderDocumentResponseDto);
+
+        mockMvc.perform(get("/order/getTraceabilityOrder")
+                        .param("idOrder",String.valueOf(idOrder)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idOrder").value(orderDocumentResponseDto.getIdOrder()))
+                .andExpect(jsonPath("$.idClient").value(orderDocumentResponseDto.getIdClient()))
+                .andExpect(jsonPath("$.idEmployee").value(orderDocumentResponseDto.getIdEmployee()))
+                .andExpect(jsonPath("$.dateInit").value(orderDocumentResponseDto.getDateInit()))
+                .andExpect(jsonPath("$.dateEnd").value(orderDocumentResponseDto.getDateEnd()))
+                .andExpect(jsonPath("$.previousStatus").value(orderDocumentResponseDto.getPreviousStatus()))
+                .andExpect(jsonPath("$.actualStatus").value(orderDocumentResponseDto.getActualStatus()))
+                .andExpect(jsonPath("$.order").value(orderDocumentResponseDto.getOrder()));
+    }
+
+    @Test
+    void getTraceabilityOrders() throws Exception {
+        List<OrderDocumentResponseDto> orderDocumentResponseDto = List.of(new OrderDocumentResponseDto(1L,1L,1L,null,null,null,1L,null));
+        when(orderHandler.getTraceabilityOrders()).thenReturn(orderDocumentResponseDto);
+
+        mockMvc.perform(get("/order/getTraceabilityOrders"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0]idOrder").value(orderDocumentResponseDto.get(0).getIdOrder()))
+                .andExpect(jsonPath("$[0]idClient").value(orderDocumentResponseDto.get(0).getIdClient()))
+                .andExpect(jsonPath("$[0]idEmployee").value(orderDocumentResponseDto.get(0).getIdEmployee()))
+                .andExpect(jsonPath("$[0]dateInit").value(orderDocumentResponseDto.get(0).getDateInit()))
+                .andExpect(jsonPath("$[0]dateEnd").value(orderDocumentResponseDto.get(0).getDateEnd()))
+                .andExpect(jsonPath("$[0]previousStatus").value(orderDocumentResponseDto.get(0).getPreviousStatus()))
+                .andExpect(jsonPath("$[0]actualStatus").value(orderDocumentResponseDto.get(0).getActualStatus()))
+                .andExpect(jsonPath("$[0]order").value(orderDocumentResponseDto.get(0).getOrder()));
     }
 }

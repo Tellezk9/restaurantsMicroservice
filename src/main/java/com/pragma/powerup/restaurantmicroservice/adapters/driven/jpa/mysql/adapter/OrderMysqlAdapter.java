@@ -9,7 +9,7 @@ import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.mappe
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.repositories.IOrderRepository;
 import com.pragma.powerup.restaurantmicroservice.configuration.Constants;
 import com.pragma.powerup.restaurantmicroservice.domain.model.Order;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.IOrderPersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IOrderPersistencePort;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -47,6 +47,16 @@ public class OrderMysqlAdapter implements IOrderPersistencePort {
     @Override
     public Order getOrder(Long idOrder){
         Optional<OrderEntity> orderEntity = orderRepository.findById(idOrder);
+        if (orderEntity.isEmpty()) {
+            throw new OrderNotFoundException();
+        }
+
+        return orderEntityMapper.toOrder(orderEntity.get());
+    }
+
+    @Override
+    public Order getOrderBySecurityPinAndIdRestaurant(Long securityPin, Long idRestaurant) {
+        Optional<OrderEntity> orderEntity = orderRepository.findBySecurityPinAndRestaurantEntityId(securityPin,idRestaurant);
         if (orderEntity.isEmpty()) {
             throw new OrderNotFoundException();
         }

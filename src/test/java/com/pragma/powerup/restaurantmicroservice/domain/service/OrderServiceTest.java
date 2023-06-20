@@ -1,16 +1,11 @@
 package com.pragma.powerup.restaurantmicroservice.domain.service;
 
 import com.pragma.powerup.restaurantmicroservice.domain.exceptions.*;
-import com.pragma.powerup.restaurantmicroservice.domain.model.Dish;
-import com.pragma.powerup.restaurantmicroservice.domain.model.Order;
-import com.pragma.powerup.restaurantmicroservice.domain.model.OrderDish;
-import com.pragma.powerup.restaurantmicroservice.domain.model.Restaurant;
+import com.pragma.powerup.restaurantmicroservice.domain.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -82,7 +77,7 @@ class OrderServiceTest {
 
         Date expectedDate = new Date();
         Restaurant expectedRestaurant = new Restaurant(idRestaurant, null, null, null, null, null, null);
-        Order expectedOrder = new Order(null, idUser, expectedDate, status, null,null, expectedRestaurant);
+        Order expectedOrder = new Order(null, idUser, expectedDate, status, null, null, expectedRestaurant);
 
         Order actualOrder = orderService.makeNewOrderInformation(idUser, idRestaurant, status);
 
@@ -101,7 +96,7 @@ class OrderServiceTest {
         Long idOrder = 1L;
         List<Long> orderDishes = List.of(1L);
         List<Integer> amountDishes = List.of(1);
-        Order order = new Order(idOrder, null, null, null, null, null,null);
+        Order order = new Order(idOrder, null, null, null, null, null, null);
         Dish dish = new Dish(orderDishes.get(0), null, null, null, null, null, null, null);
         List<OrderDish> orderDishList = List.of(new OrderDish(order, dish, amountDishes.get(0)));
         OrderDish expectedOrderDish = orderDishList.get(0);
@@ -137,4 +132,42 @@ class OrderServiceTest {
         Long status = 4L;
         assertThrows(InvalidStatusException.class, () -> orderService.isValidStatus(status));
     }
+
+    @Test
+    void getNameDishes() {
+        List<Dish> restaurantDishes = List.of(new Dish(1L, "nameTest", null, "testDescription", 10000, null, "urlTest", true));
+        List<Long> idOrderDishes = List.of(1L);
+        List<Integer> amountDishes = List.of(1);
+
+        Map<String, String> mapExpect = new HashMap<>();
+        mapExpect.put("amount", "1");
+        mapExpect.put("nameDish", "nameTest");
+        List<Map<String, String>> resultExpect = new ArrayList<>();
+        resultExpect.add(mapExpect);
+
+        List<Map<String, String>> result = orderService.getNameDishes(restaurantDishes, idOrderDishes, amountDishes);
+
+        assertEquals(resultExpect.get(0).get("amount"),result.get(0).get("amount"));
+        assertEquals(resultExpect.get(0).get("nameDish"),result.get(0).get("nameDish"));
+
+    }
+
+    @Test
+    void makeNewOrderDocument() {
+        Long idOrder = 1L;
+
+        Map<String, String> mapExpect = new HashMap<>();
+        mapExpect.put("amount", "1");
+        mapExpect.put("nameDish", "nameTest");
+        List<Map<String, String>> dishesMapper = new ArrayList<>();
+        dishesMapper.add(mapExpect);
+        OrderDocument expectedOrder = new OrderDocument(null,idOrder,null,null,null,null,null,null,dishesMapper);
+        Order order = new Order(idOrder, null, null, null, null, null, null);
+
+        OrderDocument actualOrder = orderService.makeNewOrderDocument(order, dishesMapper);
+
+        assertEquals(expectedOrder.getIdOrder(),actualOrder.getIdOrder());
+        assertEquals(expectedOrder.getOrder(),actualOrder.getOrder());
+    }
+
 }

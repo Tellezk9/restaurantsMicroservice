@@ -8,8 +8,8 @@ import com.pragma.powerup.restaurantmicroservice.domain.model.Employee;
 import com.pragma.powerup.restaurantmicroservice.domain.model.Restaurant;
 import com.pragma.powerup.restaurantmicroservice.domain.service.RestaurantService;
 import com.pragma.powerup.restaurantmicroservice.domain.service.Validator;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.IEmployeePersistencePort;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.IRestaurantPersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IEmployeePersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IRestaurantPersistencePort;
 
 import java.util.List;
 

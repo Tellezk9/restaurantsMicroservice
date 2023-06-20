@@ -61,7 +61,7 @@ class DishRestControllerTest {
                         .param("description", "test")
                         .param("price", "5000"))
                 .andDo(print())
-                .andExpect(status().isAccepted())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value(Constants.DISH_UPDATED_MESSAGE));
 
     }
@@ -74,7 +74,7 @@ class DishRestControllerTest {
                         .param("idDish", "1")
                         .param("state", "true"))
                 .andDo(print())
-                .andExpect(status().isAccepted())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value(Constants.DISH_UPDATED_MESSAGE));
 
     }

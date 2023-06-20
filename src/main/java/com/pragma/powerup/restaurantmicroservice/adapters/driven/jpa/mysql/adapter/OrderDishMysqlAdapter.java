@@ -5,7 +5,7 @@ import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.excep
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.mappers.IOrderDishEntityMapper;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.repositories.IOrderDishRepository;
 import com.pragma.powerup.restaurantmicroservice.domain.model.OrderDish;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.IOrderDishPersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IOrderDishPersistencePort;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

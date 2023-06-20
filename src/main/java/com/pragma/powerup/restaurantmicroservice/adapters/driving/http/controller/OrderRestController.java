@@ -2,6 +2,7 @@ package com.pragma.powerup.restaurantmicroservice.adapters.driving.http.controll
 
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.request.OrderRequestDto;
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderDishResponseDto;
+import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderDocumentResponseDto;
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderResponseDto;
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.handlers.IOrderHandler;
 import com.pragma.powerup.restaurantmicroservice.configuration.Constants;
@@ -70,7 +71,7 @@ public class OrderRestController {
 
     @Operation(summary = "Assign a order",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "Assigned order",
+                    @ApiResponse(responseCode = "202", description = "Assigned order",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Map"))),
                     @ApiResponse(responseCode = "403", description = "Role not allowed for assign order",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
@@ -84,7 +85,7 @@ public class OrderRestController {
 
     @Operation(summary = "Change order status",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "status changed",
+                    @ApiResponse(responseCode = "200", description = "status changed",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Map"))),
                     @ApiResponse(responseCode = "403", description = "Role not allowed for change order status",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
@@ -92,7 +93,7 @@ public class OrderRestController {
     @PutMapping("/changeOrderStatus")
     public ResponseEntity<Map<String, String>> changeOrderStatus(@RequestParam Long idOrder,Long status) {
         orderHandler.changeOrderStatus(idOrder,status);
-        return ResponseEntity.status(HttpStatus.ACCEPTED)
+        return ResponseEntity.status(HttpStatus.OK)
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_STATUS_CHANGED_MESSAGE));
     }
     @Operation(summary = "Deliver an order",
@@ -123,5 +124,29 @@ public class OrderRestController {
         orderHandler.cancelOrder(idOrder);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_CANCELED_MESSAGE));
+    }
+
+    @Operation(summary = "get traceability order",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "traceability order returned",
+                            content = @Content(mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = OrderDocumentResponseDto.class)))),
+                    @ApiResponse(responseCode = "404", description = "No data found",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
+    @GetMapping("/getTraceabilityOrder")
+    public ResponseEntity<OrderDocumentResponseDto> getTraceabilityOrder(@RequestParam Long idOrder) {
+        return ResponseEntity.ok(orderHandler.getTraceabilityOrder(idOrder));
+    }
+
+    @Operation(summary = "get all traceability orders",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "all traceability orders returned",
+                            content = @Content(mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = OrderDocumentResponseDto.class)))),
+                    @ApiResponse(responseCode = "404", description = "No data found",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
+    @GetMapping("/getTraceabilityOrders")
+    public ResponseEntity<List<OrderDocumentResponseDto>> getTraceabilityOrders() {
+        return ResponseEntity.ok(orderHandler.getTraceabilityOrders());
     }
 }

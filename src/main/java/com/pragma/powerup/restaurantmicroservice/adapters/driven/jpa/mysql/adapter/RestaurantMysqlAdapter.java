@@ -7,7 +7,7 @@ import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.mappe
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.repositories.IRestaurantRepository;
 import com.pragma.powerup.restaurantmicroservice.domain.exceptions.NotOwnerTheRestaurantException;
 import com.pragma.powerup.restaurantmicroservice.domain.model.Restaurant;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.IRestaurantPersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IRestaurantPersistencePort;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,7 +34,7 @@ public class RestaurantMysqlAdapter implements IRestaurantPersistencePort {
     public Restaurant getRestaurant(Long idRestaurant) {
 
         Optional<RestaurantEntity> restaurantEntity = restaurantRepository.findById(idRestaurant);
-        if (!restaurantEntity.isPresent()) {
+        if (restaurantEntity.isEmpty()) {
             throw new NoDataFoundException();
         }
         return restaurantEntityMapper.toRestaurant(restaurantEntity.get());
@@ -62,7 +62,7 @@ public class RestaurantMysqlAdapter implements IRestaurantPersistencePort {
     @Override
     public Restaurant getRestaurantByIdOwnerAndIdRestaurant(Long idOwner, Long idRestaurant) {
         Optional<RestaurantEntity> restaurantEntity = restaurantRepository.findByIdOwnerAndId(idOwner, idRestaurant);
-        if (!restaurantEntity.isPresent()) {
+        if (restaurantEntity.isEmpty()) {
             throw new NotOwnerTheRestaurantException();
         }
         return restaurantEntityMapper.toRestaurant(restaurantEntity.get());

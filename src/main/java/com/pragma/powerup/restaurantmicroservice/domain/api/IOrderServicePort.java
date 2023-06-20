@@ -2,6 +2,7 @@ package com.pragma.powerup.restaurantmicroservice.domain.api;
 
 import com.pragma.powerup.restaurantmicroservice.domain.model.Order;
 import com.pragma.powerup.restaurantmicroservice.domain.model.OrderDish;
+import com.pragma.powerup.restaurantmicroservice.domain.model.OrderDocument;
 
 import java.util.List;
 
@@ -13,4 +14,6 @@ public interface IOrderServicePort {
     void changeOrderStatus(Long idOrder, Long status);
     void deliverOrder(Long securityCode);
     void cancelOrder(Long idOrder);
+    OrderDocument getTraceabilityOrder(Long idOrder);
+    List<OrderDocument> getTraceabilityOrders();
 }

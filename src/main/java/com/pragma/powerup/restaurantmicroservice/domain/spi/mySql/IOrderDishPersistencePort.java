@@ -1,4 +1,4 @@
-package com.pragma.powerup.restaurantmicroservice.domain.spi;
+package com.pragma.powerup.restaurantmicroservice.domain.spi.mySql;
 
 import com.pragma.powerup.restaurantmicroservice.domain.model.OrderDish;
 

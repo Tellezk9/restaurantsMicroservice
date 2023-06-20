@@ -11,6 +11,7 @@
 * ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=java&logoColor=white)
 * ![Spring](https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
 * ![Gradle](https://img.shields.io/badge/Gradle-02303A.svg?style=for-the-badge&logo=Gradle&logoColor=white)
+* ![MongoDB](https://img.shields.io/badge/MongoDB-47A248.svg?style=for-the-badge&logo=MongoDB&logoColor=white)
 * ![MySQL](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)
 * ![OpenAPI](https://img.shields.io/badge/OpenAPI-<COLOR>?style=for-the-badge&logo=OpenAPI%20Initiative&logoColor=white)
 
@@ -43,12 +44,29 @@ To get a local copy up and running follow these steps.
    # src/main/resources/application-dev.yml
    spring:
       datasource:
-          url: jdbc:mysql://localhost:<your-MySQL-port>/plazoleta
+          url: jdbc:mysql://<your-url-database>:<your-MySQL-port>/plazoleta
           username: root
           password: <your-password>
    ```
-5. After the tables are created execute src/main/resources/data.sql content to populate the database
-6. Open Swagger UI and search the /auth/login endpoint and login with userDni: 123, password: 1234
+5. Create a new database in MongoDB called TraceabilityDB
+6. Update the database connection settings
+   ```yml
+   # src/main/resources/application-dev.yml
+   spring:
+      data:
+        mongodb:
+          uri: mongodb://<your-uri-Mongo>
+   ```
+6. Add the microservices connection settings
+   ```yml
+   # src/main/resources/application-dev.yml
+   app:
+      urls:
+        urlToUserMicroService: "http://<your-url-userMicroservice>:<your-port>/"
+        urlToMessagingMicroService: "http://<your-url-messagingMicroservice>:<your-port>/"
+   ```
+7. After the tables are created execute src/main/resources/data.sql content to populate the database
+8. Open Swagger UI and search the /auth/login endpoint and login with userDni: 123, password: 1234
 
 <!-- USAGE -->
 ## Usage

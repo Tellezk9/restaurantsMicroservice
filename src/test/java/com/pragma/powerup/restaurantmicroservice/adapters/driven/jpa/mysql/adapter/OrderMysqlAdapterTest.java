@@ -242,4 +242,34 @@ class OrderMysqlAdapterTest {
         assertThrows(OrderCannotBeCanceledException.class, () -> orderMysqlAdapter.cancelOrder(idOrder, idClient, status));
         verify(orderRepository, times(1)).findByIdAndIdClient(idOrder, idClient);
     }
+
+    @Test
+    void findBySecurityPinAndRestaurantEntityId() {
+        Long securityPin = 4213L;
+        Long idRestaurant = 1L;
+        Long status = 4L;
+
+        OrderEntity orderEntity = new OrderEntity(null, null, null, status, null, null, null);
+        Order order = new Order(null, null, null, status, null, null, null);
+
+        when(orderRepository.findBySecurityPinAndRestaurantEntityId(securityPin, idRestaurant)).thenReturn(Optional.of(orderEntity));
+        when(orderEntityMapper.toOrder(orderEntity)).thenReturn(order);
+
+        orderMysqlAdapter.getOrderBySecurityPinAndIdRestaurant(securityPin, idRestaurant);
+
+        verify(orderRepository, times(1)).findBySecurityPinAndRestaurantEntityId(securityPin, idRestaurant);
+        verify(orderEntityMapper, times(1)).toOrder(orderEntity);
+    }
+
+    @Test
+    void findBySecurityPinAndRestaurantEntityId_Conflict() {
+        Long securityPin = 4213L;
+        Long idRestaurant = 1L;
+
+        when(orderRepository.findBySecurityPinAndRestaurantEntityId(securityPin, idRestaurant)).thenReturn(Optional.empty());
+
+        assertThrows(OrderNotFoundException.class,()->orderMysqlAdapter.getOrderBySecurityPinAndIdRestaurant(securityPin,idRestaurant));
+
+        verify(orderRepository, times(1)).findBySecurityPinAndRestaurantEntityId(securityPin, idRestaurant);
+    }
 }

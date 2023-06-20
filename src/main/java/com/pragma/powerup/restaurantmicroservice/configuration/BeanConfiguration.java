@@ -1,5 +1,8 @@
 package com.pragma.powerup.restaurantmicroservice.configuration;
 
+import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mongo.adapter.OrderMongoAdapter;
+import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mongo.mappers.IOrderCollectionMapper;
+import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mongo.repositories.IOrderCollectionRepository;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.adapter.*;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.mappers.*;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.repositories.*;
@@ -10,7 +13,8 @@ import com.pragma.powerup.restaurantmicroservice.domain.api.IDishServicePort;
 import com.pragma.powerup.restaurantmicroservice.domain.api.IOrderServicePort;
 import com.pragma.powerup.restaurantmicroservice.domain.api.IRestaurantServicePort;
 import com.pragma.powerup.restaurantmicroservice.domain.geteway.IHttpAdapter;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.*;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.mongo.IOrderCollectionPersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.*;
 import com.pragma.powerup.restaurantmicroservice.domain.usecase.DishUseCase;
 import com.pragma.powerup.restaurantmicroservice.domain.usecase.OrderUseCase;
 import com.pragma.powerup.restaurantmicroservice.domain.usecase.RestaurantUseCase;
@@ -33,6 +37,8 @@ public class BeanConfiguration {
     private final IOrderEntityMapper orderEntityMapper;
     private final IOrderDishRepository orderDishRepository;
     private final IOrderDishEntityMapper orderDishEntityMapper;
+    private final IOrderCollectionRepository orderCollectionRepository;
+    private final IOrderCollectionMapper orderCollectionMapper;
     private final IClientHandler clientHandler;
     private final TokenHolder tokenHolder;
 
@@ -73,12 +79,17 @@ public class BeanConfiguration {
 
     @Bean
     public IOrderServicePort orderServicePort() {
-        return new OrderUseCase(orderPersistencePort(), dishPersistencePort(), orderDishPersistencePort(), employeePersistencePort(), tokenHolder, httpAdapter());
+        return new OrderUseCase(orderPersistencePort(), orderCollectionPersistencePort(), dishPersistencePort(), orderDishPersistencePort(), employeePersistencePort(), tokenHolder, httpAdapter());
     }
 
     @Bean
     public IOrderPersistencePort orderPersistencePort() {
         return new OrderMysqlAdapter(orderRepository, orderEntityMapper);
+    }
+
+    @Bean
+    public IOrderCollectionPersistencePort orderCollectionPersistencePort() {
+        return new OrderMongoAdapter(orderCollectionRepository, orderCollectionMapper);
     }
 
     @Bean
