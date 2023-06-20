@@ -7,7 +7,7 @@ import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.excep
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.mappers.IEmployeeEntityMapper;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.repositories.IEmployeeRepository;
 import com.pragma.powerup.restaurantmicroservice.domain.model.Employee;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.IEmployeePersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IEmployeePersistencePort;
 import lombok.AllArgsConstructor;
 
 import java.util.Optional;

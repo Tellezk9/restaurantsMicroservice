@@ -1,7 +1,9 @@
 package com.pragma.powerup.restaurantmicroservice.adapters.driving.http.mapper;
 
+import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderDocumentResponseDto;
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderResponseDto;
 import com.pragma.powerup.restaurantmicroservice.domain.model.Order;
+import com.pragma.powerup.restaurantmicroservice.domain.model.OrderDocument;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -17,4 +19,6 @@ public interface IOrderResponseMapper {
     List<OrderResponseDto> toListOrderResponseDto(List<Order> orders);
     @Mapping(target = "idRestaurant", source = "restaurant.id")
     OrderResponseDto toOrderResponseDto(Order order);
+    OrderDocumentResponseDto toOrderDocumentResponseDto(OrderDocument orderDocument);
+    List<OrderDocumentResponseDto> toOrderDocumentResponseDtoList(List<OrderDocument> orderDocument);
 }

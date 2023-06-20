@@ -2,7 +2,6 @@ package com.pragma.powerup.restaurantmicroservice.adapters.driving.http.controll
 
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.request.DishRequestDto;
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.DishResponseDto;
-import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.RestaurantResponseDto;
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.handlers.IDishHandler;
 import com.pragma.powerup.restaurantmicroservice.configuration.Constants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,19 +45,19 @@ public class DishRestController {
 
     @Operation(summary = "Update a dish",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "dish updated",
+                    @ApiResponse(responseCode = "200", description = "dish updated",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Map"))),
                     @ApiResponse(responseCode = "403", description = "Role not allowed for dish modification",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
     @PutMapping("/{id}")
     public ResponseEntity<Map<String, String>> updateDish(@PathVariable Integer id, @RequestParam String description, @RequestParam Integer price) {
         dishHandler.updateDish(id, description, price);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.DISH_UPDATED_MESSAGE));
+        return ResponseEntity.status(HttpStatus.OK).body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.DISH_UPDATED_MESSAGE));
     }
 
     @Operation(summary = "change dish state",
             responses = {
-                    @ApiResponse(responseCode = "202", description = "Dish state updated",
+                    @ApiResponse(responseCode = "200", description = "Dish state updated",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Map"))),
                     @ApiResponse(responseCode = "412", description = "Dish not exists",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error"))),
@@ -69,14 +68,14 @@ public class DishRestController {
     @PutMapping("/changeStateDish")
     public ResponseEntity<Map<String, String>> changeDishState(@RequestParam Integer idDish, Boolean state) {
         dishHandler.changeDishState(idDish, state);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.DISH_UPDATED_MESSAGE));
+        return ResponseEntity.status(HttpStatus.OK).body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.DISH_UPDATED_MESSAGE));
     }
 
     @Operation(summary = "Get the restaurant dishes",
             responses = {
                     @ApiResponse(responseCode = "200", description = "All restaurant dishes returned",
                             content = @Content(mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = RestaurantResponseDto.class)))),
+                                    array = @ArraySchema(schema = @Schema(implementation = DishResponseDto.class)))),
                     @ApiResponse(responseCode = "404", description = "No data found",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
     @GetMapping("/getDishes")

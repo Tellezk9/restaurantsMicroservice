@@ -6,6 +6,9 @@ spring:
     url: jdbc:mysql://localhost:3306/plazoleta
     username: root
     password: admin
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/TraceabilityDB
   jpa:
     hibernate:
       ddl-auto: update

@@ -4,10 +4,11 @@ import com.pragma.powerup.restaurantmicroservice.configuration.Constants;
 import com.pragma.powerup.restaurantmicroservice.domain.auth.IPrincipalUser;
 import com.pragma.powerup.restaurantmicroservice.domain.geteway.IHttpAdapter;
 import com.pragma.powerup.restaurantmicroservice.domain.model.*;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.IDishPersistencePort;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.IEmployeePersistencePort;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.IOrderDishPersistencePort;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.IOrderPersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.mongo.IOrderCollectionPersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IDishPersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IEmployeePersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IOrderDishPersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IOrderPersistencePort;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,7 +16,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.Mockito.*;
 
@@ -24,6 +28,8 @@ class OrderUseCaseTest {
 
     @Mock
     private IOrderPersistencePort orderPersistencePort;
+    @Mock
+    private IOrderCollectionPersistencePort orderCollectionPersistencePort;
     @Mock
     private IOrderDishPersistencePort orderDishPersistencePort;
     @Mock
@@ -43,8 +49,8 @@ class OrderUseCaseTest {
         Long idRestaurant = 2L;
         List<Long> orderDishes = List.of(1L);
         List<Integer> amountDishes = List.of(2);
-
         List<Dish> dishList = List.of(new Dish(1L, null, null, null, null, null, null, null));
+
         Restaurant restaurant = new Restaurant(1L, null, null, null, null, null, null);
         Order order = new Order(1L, 1L, null, 2L, null, null, restaurant);
 
@@ -182,15 +188,18 @@ class OrderUseCaseTest {
 
         Restaurant restaurant = new Restaurant(1L, null, null, null, null, null, null);
         Employee employee = new Employee(1L, idUser, restaurant);
+        Order order = new Order(1L, 1L, null, 2L, idUser, securityCode, restaurant);
 
         when(authUser.getIdUser()).thenReturn(idUser);
         when(authUser.getRole()).thenReturn(role);
         when(employeePersistencePort.getEmployeeById(idUser)).thenReturn(employee);
+        when(orderPersistencePort.getOrderBySecurityPinAndIdRestaurant(securityCode, employee.getIdRestaurant().getId())).thenReturn(order);
         doNothing().when(orderPersistencePort).deliverOrder(securityCode, employee.getIdRestaurant().getId(), status);
 
         orderUseCase.deliverOrder(securityCode);
 
         verify(orderPersistencePort, times(1)).deliverOrder(securityCode, employee.getIdRestaurant().getId(), status);
+        verify(orderPersistencePort, times(1)).getOrderBySecurityPinAndIdRestaurant(securityCode, employee.getIdRestaurant().getId());
         verify(employeePersistencePort, times(1)).getEmployeeById(idUser);
     }
 
@@ -208,5 +217,85 @@ class OrderUseCaseTest {
         orderUseCase.cancelOrder(idOrder);
 
         verify(orderPersistencePort, times(1)).cancelOrder(idOrder, idOrder, status);
+    }
+
+    @Test
+    void saveTraceabilityOrder() {
+        Order orderInformation = new Order(null, null, null, null, null, null, null);
+        List<Map<String, String>> dishesMapped = new ArrayList<>();
+
+        doNothing().when(orderCollectionPersistencePort).saveOrderCollection(Mockito.any(OrderDocument.class));
+
+        orderUseCase.saveTraceabilityOrder(orderInformation, dishesMapped);
+
+        verify(orderCollectionPersistencePort, times(1)).saveOrderCollection(Mockito.any(OrderDocument.class));
+    }
+
+    @Test
+    void getTraceabilityOrder() {
+        String role = Constants.CLIENT_ROLE_NAME;
+        Long idOrder = 1L;
+        OrderDocument orderDocument = new OrderDocument(null, null, null, null, null, null, null, null, null);
+
+        when(authUser.getRole()).thenReturn(role);
+        when(orderCollectionPersistencePort.getOrderCollection(idOrder)).thenReturn(orderDocument);
+
+        orderUseCase.getTraceabilityOrder(idOrder);
+
+        verify(orderCollectionPersistencePort, times(1)).getOrderCollection(idOrder);
+    }
+
+    @Test
+    void getTraceabilityOrders() {
+        String role = Constants.CLIENT_ROLE_NAME;
+        Long idOrder = 1L;
+        OrderDocument orderDocument = new OrderDocument(null, null, null, null, null, null, null, null, null);
+
+        when(authUser.getRole()).thenReturn(role);
+        when(authUser.getIdUser()).thenReturn(idOrder);
+        when(orderCollectionPersistencePort.getOrderCollections(idOrder)).thenReturn(List.of(orderDocument));
+
+        orderUseCase.getTraceabilityOrders();
+
+        verify(orderCollectionPersistencePort, times(1)).getOrderCollections(idOrder);
+    }
+
+    @Test
+    void assignOrderCollection() {
+        Long idOrder = 1L;
+        Long idEmployee = 1L;
+        Long newStatus = Constants.ORDER_STATUS_PREPARING;
+        String role = Constants.EMPLOYEE_ROLE_NAME;
+
+        when(authUser.getRole()).thenReturn(role);
+        doNothing().when(orderCollectionPersistencePort).assignOrderCollection(idOrder, idEmployee, newStatus);
+
+        orderUseCase.assignOrderCollection(idOrder, idEmployee, newStatus);
+
+        verify(orderCollectionPersistencePort, times(1)).assignOrderCollection(idOrder, idEmployee, newStatus);
+    }
+
+    @Test
+    void changeOrderCollectionStatus() {
+        Long idOrder = 1L;
+        Long newStatus = Constants.ORDER_STATUS_PREPARING;
+        Date finalDate = null;
+        doNothing().when(orderCollectionPersistencePort).changeOrderCollectionStatus(idOrder,newStatus,finalDate);
+
+        orderUseCase.changeOrderCollectionStatus(idOrder,newStatus);
+
+        verify(orderCollectionPersistencePort,times(1)).changeOrderCollectionStatus(idOrder,newStatus,finalDate);
+    }
+
+    @Test
+    void updateOrderCollectionStatus() {
+        Long idOrder = 1L;
+        Long newStatus = Constants.ORDER_STATUS_CANCELED;
+
+        doNothing().when(orderCollectionPersistencePort).updateOrderCollectionStatus(idOrder,newStatus);
+
+        orderUseCase.updateOrderCollectionStatus(idOrder,newStatus);
+
+        verify(orderCollectionPersistencePort,times(1)).updateOrderCollectionStatus(idOrder,newStatus);
     }
 }

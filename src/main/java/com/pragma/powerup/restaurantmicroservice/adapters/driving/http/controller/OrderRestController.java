@@ -2,6 +2,7 @@ package com.pragma.powerup.restaurantmicroservice.adapters.driving.http.controll
 
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.request.OrderRequestDto;
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderDishResponseDto;
+import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderDocumentResponseDto;
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderResponseDto;
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.handlers.IOrderHandler;
 import com.pragma.powerup.restaurantmicroservice.configuration.Constants;
@@ -123,5 +124,29 @@ public class OrderRestController {
         orderHandler.cancelOrder(idOrder);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.ORDER_CANCELED_MESSAGE));
+    }
+
+    @Operation(summary = "get traceability order",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "traceability order returned",
+                            content = @Content(mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = OrderDocumentResponseDto.class)))),
+                    @ApiResponse(responseCode = "404", description = "No data found",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
+    @GetMapping("/getTraceabilityOrder")
+    public ResponseEntity<OrderDocumentResponseDto> getTraceabilityOrder(@RequestParam Long idOrder) {
+        return ResponseEntity.ok(orderHandler.getTraceabilityOrder(idOrder));
+    }
+
+    @Operation(summary = "get all traceability orders",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "all traceability orders returned",
+                            content = @Content(mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = OrderDocumentResponseDto.class)))),
+                    @ApiResponse(responseCode = "404", description = "No data found",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
+    @GetMapping("/getTraceabilityOrders")
+    public ResponseEntity<List<OrderDocumentResponseDto>> getTraceabilityOrders() {
+        return ResponseEntity.ok(orderHandler.getTraceabilityOrders());
     }
 }

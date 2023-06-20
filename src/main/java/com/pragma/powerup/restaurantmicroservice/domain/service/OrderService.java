@@ -2,15 +2,9 @@ package com.pragma.powerup.restaurantmicroservice.domain.service;
 
 import com.pragma.powerup.restaurantmicroservice.configuration.Constants;
 import com.pragma.powerup.restaurantmicroservice.domain.exceptions.*;
-import com.pragma.powerup.restaurantmicroservice.domain.model.Dish;
-import com.pragma.powerup.restaurantmicroservice.domain.model.Order;
-import com.pragma.powerup.restaurantmicroservice.domain.model.OrderDish;
-import com.pragma.powerup.restaurantmicroservice.domain.model.Restaurant;
+import com.pragma.powerup.restaurantmicroservice.domain.model.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 
 public class OrderService {
@@ -32,6 +26,35 @@ public class OrderService {
             if (!result) {
                 throw new DishDoesNotBelongToTheRestaurantException();
             }
+        }
+
+        return result;
+    }
+
+    public List<Map<String, String>> getNameDishes(List<Dish> restaurantDishes, List<Long> idOrderDishes, List<Integer> amountDishes) {
+        if (restaurantDishes.isEmpty() || idOrderDishes.isEmpty()) {
+            throw new EmptyFieldFoundException();
+        }
+        List<Map<String, String>> result = new ArrayList<>();
+        boolean validDish = false;
+        int i = 0;
+
+        for (Long dishId : idOrderDishes) {
+            validDish = true;
+            for (Dish dish : restaurantDishes) {
+                Map<String, String> map = new HashMap<>();
+                if (dish.getId().equals(dishId)) {
+                    map.put("nameDish", dish.getName());
+                    map.put("amount", amountDishes.get(i).toString());
+                    result.add(map);
+                    validDish = true;
+                    break;
+                }
+            }
+            if (!validDish) {
+                throw new DishDoesNotBelongToTheRestaurantException();
+            }
+            i++;
         }
 
         return result;
@@ -92,5 +115,19 @@ public class OrderService {
         }
 
         return true;
+    }
+
+
+    public OrderDocument makeNewOrderDocument(Order orderInformation, List<Map<String, String>> dishesMapped) {
+
+        Long idOrder = orderInformation.getId();
+        Long idClient = orderInformation.getIdClient();
+        Long idEmployee = null;
+        Date dateInit = orderInformation.getDate();
+        Date dateEnd = null;
+        Long previousStatus = null;
+        Long actualStatus = orderInformation.getStatus();
+        List<Map<String, String>> order = dishesMapped;
+        return new OrderDocument(null, idOrder, idClient, idEmployee, dateInit, dateEnd, previousStatus, actualStatus, order);
     }
 }

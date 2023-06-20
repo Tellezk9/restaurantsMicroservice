@@ -5,7 +5,7 @@ import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.excep
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.mappers.IDishEntityMapper;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.repositories.IDishRepository;
 import com.pragma.powerup.restaurantmicroservice.domain.model.Dish;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.IDishPersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IDishPersistencePort;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +39,7 @@ public class DishMysqlAdapter implements IDishPersistencePort {
     @Override
     public Dish getDishById(Long id) {
         Optional<DishEntity> dishEntity = dishRepository.findById(id);
-        if (!dishEntity.isPresent()) {
+        if (dishEntity.isEmpty()) {
             throw new DishNotFoundException();
         }
         return dishEntityMapper.toDish(dishEntity.get());
@@ -48,7 +48,7 @@ public class DishMysqlAdapter implements IDishPersistencePort {
     @Override
     public void changeDishState(Long idDish, Boolean state) {
         Optional<DishEntity> optionalDishEntity = dishRepository.findById(idDish);
-        if (!optionalDishEntity.isPresent()) {
+        if (optionalDishEntity.isEmpty()) {
             throw new DishNotFoundException();
         }
         DishEntity dishEntity = optionalDishEntity.get();

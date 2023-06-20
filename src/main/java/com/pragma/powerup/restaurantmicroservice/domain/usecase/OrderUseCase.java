@@ -7,16 +7,20 @@ import com.pragma.powerup.restaurantmicroservice.domain.geteway.IHttpAdapter;
 import com.pragma.powerup.restaurantmicroservice.domain.model.*;
 import com.pragma.powerup.restaurantmicroservice.domain.service.OrderService;
 import com.pragma.powerup.restaurantmicroservice.domain.service.Validator;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.IDishPersistencePort;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.IEmployeePersistencePort;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.IOrderDishPersistencePort;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.IOrderPersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.mongo.IOrderCollectionPersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IDishPersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IEmployeePersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IOrderDishPersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IOrderPersistencePort;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class OrderUseCase implements IOrderServicePort {
 
     private final IOrderPersistencePort orderPersistencePort;
+    private final IOrderCollectionPersistencePort orderCollectionPersistencePort;
     private final IOrderDishPersistencePort orderDishPersistencePort;
     private final IDishPersistencePort dishPersistencePort;
     private final IEmployeePersistencePort employeePersistencePort;
@@ -25,8 +29,9 @@ public class OrderUseCase implements IOrderServicePort {
     private final Validator validator;
     private final OrderService orderService;
 
-    public OrderUseCase(IOrderPersistencePort orderPersistencePort, IDishPersistencePort dishPersistencePort, IOrderDishPersistencePort orderDishPersistencePort, IEmployeePersistencePort employeePersistencePort, IPrincipalUser authUser, IHttpAdapter httpAdapter) {
+    public OrderUseCase(IOrderPersistencePort orderPersistencePort, IOrderCollectionPersistencePort orderCollectionPersistencePort, IDishPersistencePort dishPersistencePort, IOrderDishPersistencePort orderDishPersistencePort, IEmployeePersistencePort employeePersistencePort, IPrincipalUser authUser, IHttpAdapter httpAdapter) {
         this.orderPersistencePort = orderPersistencePort;
+        this.orderCollectionPersistencePort = orderCollectionPersistencePort;
         this.orderDishPersistencePort = orderDishPersistencePort;
         this.dishPersistencePort = dishPersistencePort;
         this.employeePersistencePort = employeePersistencePort;
@@ -44,7 +49,7 @@ public class OrderUseCase implements IOrderServicePort {
 
         orderService.restaurantHasTheDishes(dishList, orderDishes);
 
-
+        //Guarda orden en la base de datos
         Order orderInformation = orderService.makeNewOrderInformation(authUser.getIdUser(), idRestaurant, Constants.ORDER_STATUS_PENDING);
         orderPersistencePort.saveOrderInformation(orderInformation);
 
@@ -52,7 +57,12 @@ public class OrderUseCase implements IOrderServicePort {
 
         List<OrderDish> orderDishList = orderService.makeNewListOrderDish(orderInformation.getId(), orderDishes, amountDishes);
 
+        //Guarda los platos de la orden en la base de datos
         orderDishPersistencePort.saveOrderDish(orderDishList);
+
+        //Guarda la trazabilidad en la base de datos de mongo
+        List<Map<String, String>> dishesMapped = orderService.getNameDishes(dishList, orderDishes, amountDishes);
+        saveTraceabilityOrder(orderInformation, dishesMapped);
     }
 
     public List<Order> getOrders(Long status, Long idRestaurant, Integer page) {
@@ -80,6 +90,8 @@ public class OrderUseCase implements IOrderServicePort {
         employeePersistencePort.getEmployeeByIdEmployeeAndIdRestaurant(authUser.getIdUser(), order.getRestaurant().getId());
 
         orderPersistencePort.assignOrder(idOrder, authUser.getIdUser(), Constants.ORDER_STATUS_PREPARING);
+
+        assignOrderCollection(idOrder, authUser.getIdUser(), Constants.ORDER_STATUS_PREPARING);
     }
 
     public void changeOrderStatus(Long idOrder, Long status) {
@@ -96,6 +108,7 @@ public class OrderUseCase implements IOrderServicePort {
             sendNotification(order);
         }
         orderPersistencePort.changeOrderStatus(idOrder, status);
+        changeOrderCollectionStatus(idOrder, status);
     }
 
     public void deliverOrder(Long securityCode) {
@@ -104,14 +117,18 @@ public class OrderUseCase implements IOrderServicePort {
 
         Employee employee = employeePersistencePort.getEmployeeById(authUser.getIdUser());
 
-        orderPersistencePort.deliverOrder(securityCode, employee.getIdRestaurant().getId(),Constants.ORDER_STATUS_DELIVERED);
+        orderPersistencePort.deliverOrder(securityCode, employee.getIdRestaurant().getId(), Constants.ORDER_STATUS_DELIVERED);
+
+        Order order = orderPersistencePort.getOrderBySecurityPinAndIdRestaurant(securityCode, employee.getIdRestaurant().getId());
+        updateOrderCollectionStatus(order.getId(), Constants.ORDER_STATUS_DELIVERED);
     }
 
     public void cancelOrder(Long idOrder) {
         validator.hasRoleValid(authUser.getRole(), Constants.CLIENT_ROLE_NAME);
         validator.isIdValid(Integer.valueOf(String.valueOf(idOrder)));
 
-        orderPersistencePort.cancelOrder(idOrder,authUser.getIdUser(),Constants.ORDER_STATUS_CANCELED);
+        orderPersistencePort.cancelOrder(idOrder, authUser.getIdUser(), Constants.ORDER_STATUS_CANCELED);
+        updateOrderCollectionStatus(idOrder, Constants.ORDER_STATUS_CANCELED);
     }
 
     public void sendNotification(Order order) {
@@ -121,5 +138,40 @@ public class OrderUseCase implements IOrderServicePort {
         client.setSecurityPin(order.getSecurityPin());
 
         httpAdapter.sendNotification(client, authUser.getToken());
+    }
+
+    public void saveTraceabilityOrder(Order orderInformation, List<Map<String, String>> dishesMapped) {
+        OrderDocument orderDocument =orderService.makeNewOrderDocument(orderInformation, dishesMapped);
+        orderCollectionPersistencePort.saveOrderCollection(orderDocument);
+    }
+
+    public OrderDocument getTraceabilityOrder(Long idOrder) {
+        validator.hasRoleValid(authUser.getRole(), Constants.CLIENT_ROLE_NAME);
+
+        return orderCollectionPersistencePort.getOrderCollection(idOrder);
+    }
+
+    public List<OrderDocument> getTraceabilityOrders() {
+        validator.hasRoleValid(authUser.getRole(), Constants.CLIENT_ROLE_NAME);
+
+        return orderCollectionPersistencePort.getOrderCollections(authUser.getIdUser());
+    }
+
+    public void assignOrderCollection(Long idOrder, Long idEmployee, Long newStatus) {
+        validator.hasRoleValid(authUser.getRole(), Constants.EMPLOYEE_ROLE_NAME);
+
+        orderCollectionPersistencePort.assignOrderCollection(idOrder, idEmployee, newStatus);
+    }
+
+    public void changeOrderCollectionStatus(Long idOrder, Long newStatus) {
+        Date finalDate = null;
+        if (newStatus.equals(Constants.ORDER_STATUS_OK)) {
+            finalDate = new Date();
+        }
+        orderCollectionPersistencePort.changeOrderCollectionStatus(idOrder, newStatus, finalDate);
+    }
+
+    public void updateOrderCollectionStatus(Long idOrder, Long newStatus) {
+        orderCollectionPersistencePort.updateOrderCollectionStatus(idOrder, newStatus);
     }
 }
