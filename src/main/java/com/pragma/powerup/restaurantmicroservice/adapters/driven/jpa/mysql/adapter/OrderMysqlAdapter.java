@@ -26,11 +26,10 @@ public class OrderMysqlAdapter implements IOrderPersistencePort {
 
     @Override
     public void saveOrderInformation(Order order) {
-        Optional<OrderEntity> orderEntity = orderRepository.findByIdClientAndRestaurantEntityIdAndStatusNot(order.getIdClient(), order.getRestaurant().getId(), Constants.ORDER_STATUS_OK);
+        Optional<OrderEntity> orderEntity = orderRepository.findByIdClientAndRestaurantEntityIdAndStatusNotAndStatusNotAndStatusNot(order.getIdClient(), order.getRestaurant().getId(), Constants.ORDER_STATUS_OK, Constants.ORDER_STATUS_DELIVERED, Constants.ORDER_STATUS_CANCELED);
         if (orderEntity.isPresent()) {
             throw new ClientHasPendingOrderException();
         }
-
         orderRepository.save(orderEntityMapper.toOrderEntity(order));
     }
 
@@ -45,7 +44,7 @@ public class OrderMysqlAdapter implements IOrderPersistencePort {
     }
 
     @Override
-    public Order getOrder(Long idOrder){
+    public Order getOrder(Long idOrder) {
         Optional<OrderEntity> orderEntity = orderRepository.findById(idOrder);
         if (orderEntity.isEmpty()) {
             throw new OrderNotFoundException();
@@ -56,7 +55,7 @@ public class OrderMysqlAdapter implements IOrderPersistencePort {
 
     @Override
     public Order getOrderBySecurityPinAndIdRestaurant(Long securityPin, Long idRestaurant) {
-        Optional<OrderEntity> orderEntity = orderRepository.findBySecurityPinAndRestaurantEntityId(securityPin,idRestaurant);
+        Optional<OrderEntity> orderEntity = orderRepository.findBySecurityPinAndRestaurantEntityId(securityPin, idRestaurant);
         if (orderEntity.isEmpty()) {
             throw new OrderNotFoundException();
         }
@@ -76,7 +75,7 @@ public class OrderMysqlAdapter implements IOrderPersistencePort {
     }
 
     @Override
-    public void assignOrder(Long idOrder,Long idEmployee,Long status) {
+    public void assignOrder(Long idOrder, Long idEmployee, Long status) {
         Optional<OrderEntity> orderEntity = orderRepository.findById(idOrder);
 
         if (orderEntity.isEmpty()) {
@@ -90,10 +89,10 @@ public class OrderMysqlAdapter implements IOrderPersistencePort {
     @Override
     public void changeOrderStatus(Long idOrder, Long status) {
         Optional<OrderEntity> orderEntity = orderRepository.findById(idOrder);
-        if (orderEntity.isEmpty()){
+        if (orderEntity.isEmpty()) {
             throw new OrderNotFoundException();
         }
-        if (orderEntity.get().getStatus().equals(Constants.ORDER_STATUS_DELIVERED) && !status.equals(Constants.ORDER_STATUS_OK)){
+        if (orderEntity.get().getStatus().equals(Constants.ORDER_STATUS_DELIVERED) && !status.equals(Constants.ORDER_STATUS_OK)) {
             throw new InvalidOrderStatusException();
         }
         orderEntity.get().setStatus(status);
@@ -103,7 +102,7 @@ public class OrderMysqlAdapter implements IOrderPersistencePort {
     @Override
     public void deliverOrder(Long securityPin, Long idRestaurant, Long status) {
         Optional<OrderEntity> orderEntity = orderRepository.findBySecurityPinAndRestaurantEntityIdAndStatus(securityPin, idRestaurant, Constants.ORDER_STATUS_OK);
-        if (orderEntity.isEmpty()){
+        if (orderEntity.isEmpty()) {
             throw new OrderNotFoundException();
         }
         orderEntity.get().setStatus(status);
@@ -112,11 +111,11 @@ public class OrderMysqlAdapter implements IOrderPersistencePort {
 
     @Override
     public void cancelOrder(Long idOrder, Long idClient, Long status) {
-        Optional<OrderEntity> orderEntity = orderRepository.findByIdAndIdClient(idOrder,idClient);
-        if (orderEntity.isEmpty()){
+        Optional<OrderEntity> orderEntity = orderRepository.findByIdAndIdClient(idOrder, idClient);
+        if (orderEntity.isEmpty()) {
             throw new OrderNotFoundException();
         }
-        if (!orderEntity.get().getStatus().equals(Constants.ORDER_STATUS_PENDING)){
+        if (!orderEntity.get().getStatus().equals(Constants.ORDER_STATUS_PENDING)) {
             throw new OrderCannotBeCanceledException();
         }
         orderEntity.get().setStatus(status);

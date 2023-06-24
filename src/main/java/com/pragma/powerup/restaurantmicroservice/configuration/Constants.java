@@ -9,9 +9,9 @@ public class Constants {
     public static final String EMPLOYEE_ROLE_NAME = "ROLE_EMPLOYEE";
     public static final String OWNER_ROLE_NAME = "ROLE_OWNER";
     public static final String ADMIN_ROLE_NAME = "ROLE_ADMIN";
-    public static final Long ORDER_STATUS_OK = 1L;
     public static final Long ORDER_STATUS_PENDING = 2L;
     public static final Long ORDER_STATUS_PREPARING = 3L;
+    public static final Long ORDER_STATUS_OK = 1L;
     public static final Long ORDER_STATUS_DELIVERED = 4L;
     public static final Long ORDER_STATUS_CANCELED = 5L;
     public static final int MAX_PAGE_SIZE = 3;

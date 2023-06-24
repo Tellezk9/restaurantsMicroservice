@@ -1,9 +1,7 @@
 package com.pragma.powerup.restaurantmicroservice.adapters.driving.http.handlers;
 
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.request.OrderRequestDto;
-import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderDishResponseDto;
-import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderDocumentResponseDto;
-import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderResponseDto;
+import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.*;
 
 import java.util.List;
 
@@ -17,5 +15,6 @@ public interface IOrderHandler {
     void cancelOrder(Long idOrder);
     OrderDocumentResponseDto getTraceabilityOrder(Long idOrder);
     List<OrderDocumentResponseDto> getTraceabilityOrders();
-
+    List<OrderDurationResponseDto> getOrdersDuration(Long idRestaurant);
+    List<RankingEmployeeResponseDto> getRankingEmployees(Long idRestaurant);
 }

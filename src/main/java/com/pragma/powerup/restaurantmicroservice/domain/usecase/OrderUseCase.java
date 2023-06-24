@@ -8,10 +8,7 @@ import com.pragma.powerup.restaurantmicroservice.domain.model.*;
 import com.pragma.powerup.restaurantmicroservice.domain.service.OrderService;
 import com.pragma.powerup.restaurantmicroservice.domain.service.Validator;
 import com.pragma.powerup.restaurantmicroservice.domain.spi.mongo.IOrderCollectionPersistencePort;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IDishPersistencePort;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IEmployeePersistencePort;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IOrderDishPersistencePort;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IOrderPersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.*;
 
 import java.util.Date;
 import java.util.List;
@@ -24,17 +21,19 @@ public class OrderUseCase implements IOrderServicePort {
     private final IOrderDishPersistencePort orderDishPersistencePort;
     private final IDishPersistencePort dishPersistencePort;
     private final IEmployeePersistencePort employeePersistencePort;
+    private final IRestaurantPersistencePort restaurantPersistencePort;
     private final IPrincipalUser authUser;
     private final IHttpAdapter httpAdapter;
     private final Validator validator;
     private final OrderService orderService;
 
-    public OrderUseCase(IOrderPersistencePort orderPersistencePort, IOrderCollectionPersistencePort orderCollectionPersistencePort, IDishPersistencePort dishPersistencePort, IOrderDishPersistencePort orderDishPersistencePort, IEmployeePersistencePort employeePersistencePort, IPrincipalUser authUser, IHttpAdapter httpAdapter) {
+    public OrderUseCase(IOrderPersistencePort orderPersistencePort, IOrderCollectionPersistencePort orderCollectionPersistencePort, IDishPersistencePort dishPersistencePort, IOrderDishPersistencePort orderDishPersistencePort, IEmployeePersistencePort employeePersistencePort, IRestaurantPersistencePort restaurantPersistencePort, IPrincipalUser authUser, IHttpAdapter httpAdapter) {
         this.orderPersistencePort = orderPersistencePort;
         this.orderCollectionPersistencePort = orderCollectionPersistencePort;
         this.orderDishPersistencePort = orderDishPersistencePort;
         this.dishPersistencePort = dishPersistencePort;
         this.employeePersistencePort = employeePersistencePort;
+        this.restaurantPersistencePort = restaurantPersistencePort;
         this.authUser = authUser;
         this.httpAdapter = httpAdapter;
         this.validator = new Validator();
@@ -141,20 +140,37 @@ public class OrderUseCase implements IOrderServicePort {
     }
 
     public void saveTraceabilityOrder(Order orderInformation, List<Map<String, String>> dishesMapped) {
-        OrderDocument orderDocument =orderService.makeNewOrderDocument(orderInformation, dishesMapped);
+        OrderDocument orderDocument = orderService.makeNewOrderDocument(orderInformation, dishesMapped);
         orderCollectionPersistencePort.saveOrderCollection(orderDocument);
     }
 
     public OrderDocument getTraceabilityOrder(Long idOrder) {
         validator.hasRoleValid(authUser.getRole(), Constants.CLIENT_ROLE_NAME);
 
-        return orderCollectionPersistencePort.getOrderCollection(idOrder);
+        return orderCollectionPersistencePort.getOrderCollectionByIdOrder(idOrder);
     }
 
     public List<OrderDocument> getTraceabilityOrders() {
         validator.hasRoleValid(authUser.getRole(), Constants.CLIENT_ROLE_NAME);
 
-        return orderCollectionPersistencePort.getOrderCollections(authUser.getIdUser());
+        return orderCollectionPersistencePort.getOrderCollectionsByIdClient(authUser.getIdUser());
+    }
+
+    public List<OrderDocument> getOrdersDuration(Long idRestaurant) {
+        validator.hasRoleValid(authUser.getRole(), Constants.OWNER_ROLE_NAME);
+        validator.isIdValid(Integer.valueOf(String.valueOf(idRestaurant)));
+
+        restaurantPersistencePort.getRestaurantByIdOwnerAndIdRestaurant(authUser.getIdUser(), idRestaurant);
+
+        return orderCollectionPersistencePort.getOrdersDuration(idRestaurant);
+    }
+
+    public List<RankingEmployee> getRankingEmployeesByRestaurant(Long idRestaurant){
+        validator.hasRoleValid(authUser.getRole(), Constants.OWNER_ROLE_NAME);
+
+        restaurantPersistencePort.getRestaurantByIdOwnerAndIdRestaurant(authUser.getIdUser(), idRestaurant);
+
+        return orderService.calculateAverageTimesBetweenOrders(orderCollectionPersistencePort.getOrdersByIdRestaurantOrderedByIdEmployee(idRestaurant));
     }
 
     public void assignOrderCollection(Long idOrder, Long idEmployee, Long newStatus) {

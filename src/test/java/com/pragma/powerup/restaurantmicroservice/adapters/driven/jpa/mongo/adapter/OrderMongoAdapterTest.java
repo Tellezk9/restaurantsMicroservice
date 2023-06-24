@@ -3,13 +3,15 @@ package com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mongo.adap
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mongo.collection.OrderCollection;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mongo.mappers.IOrderCollectionMapper;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mongo.repositories.IOrderCollectionRepository;
-import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.exceptions.DishNotFoundException;
+import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.exceptions.OrderNotFoundException;
+import com.pragma.powerup.restaurantmicroservice.configuration.Constants;
 import com.pragma.powerup.restaurantmicroservice.domain.model.OrderDocument;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,7 +33,7 @@ class OrderMongoAdapterTest {
 
     @Test
     void saveOrderCollection() {
-        OrderDocument orderDocument = new OrderDocument(null, null, null, null, null, null, null, null, null);
+        OrderDocument orderDocument = new OrderDocument(null, null, null, null, null, null, null, null, null, null);
         OrderCollection orderCollection = new OrderCollection();
 
         when(orderCollectionMapper.toOrderCollection(orderDocument)).thenReturn(orderCollection);
@@ -44,13 +46,13 @@ class OrderMongoAdapterTest {
     @Test
     void getOrderCollection() {
         Long idOrder = 1L;
-        OrderDocument orderDocument = new OrderDocument(null, null, null, null, null, null, null, null, null);
+        OrderDocument orderDocument = new OrderDocument(null, null, null, null, null, null, null, null, null, null);
         OrderCollection orderCollection = new OrderCollection();
 
         when(orderCollectionRepository.findByIdOrder(idOrder)).thenReturn(Optional.of(orderCollection));
         when(orderCollectionMapper.toOrderDocument(orderCollection)).thenReturn(orderDocument);
 
-        orderMongoAdapter.getOrderCollection(idOrder);
+        orderMongoAdapter.getOrderCollectionByIdOrder(idOrder);
 
         verify(orderCollectionRepository, times(1)).findByIdOrder(idOrder);
         verify(orderCollectionMapper, times(1)).toOrderDocument(orderCollection);
@@ -61,7 +63,7 @@ class OrderMongoAdapterTest {
         Long idOrder = 1L;
         when(orderCollectionRepository.findByIdOrder(idOrder)).thenReturn(Optional.empty());
 
-        assertThrows(DishNotFoundException.class, () -> orderMongoAdapter.getOrderCollection(idOrder));
+        assertThrows(OrderNotFoundException.class, () -> orderMongoAdapter.getOrderCollectionByIdOrder(idOrder));
 
         verify(orderCollectionRepository, times(1)).findByIdOrder(idOrder);
     }
@@ -69,13 +71,13 @@ class OrderMongoAdapterTest {
     @Test
     void getOrderCollections() {
         Long idClient = 1L;
-        OrderDocument orderDocument = new OrderDocument(null, null, null, null, null, null, null, null, null);
+        OrderDocument orderDocument = new OrderDocument(null, null, null, null, null, null, null, null, null, null);
         OrderCollection orderCollection = new OrderCollection();
 
         when(orderCollectionRepository.findByIdClient(idClient)).thenReturn(List.of(orderCollection));
         when(orderCollectionMapper.toOrderDocumentList(List.of(orderCollection))).thenReturn(List.of(orderDocument));
 
-        orderMongoAdapter.getOrderCollections(idClient);
+        orderMongoAdapter.getOrderCollectionsByIdClient(idClient);
 
         verify(orderCollectionRepository, times(1)).findByIdClient(idClient);
         verify(orderCollectionMapper, times(1)).toOrderDocumentList(List.of(orderCollection));
@@ -84,10 +86,9 @@ class OrderMongoAdapterTest {
     @Test
     void getOrderCollections_Conflict() {
         Long idClient = 1L;
-        List list = new ArrayList<>();
-        when(orderCollectionRepository.findByIdClient(idClient)).thenReturn(list);
+        when(orderCollectionRepository.findByIdClient(idClient)).thenReturn(List.of());
 
-        assertThrows(DishNotFoundException.class, () -> orderMongoAdapter.getOrderCollections(idClient));
+        assertThrows(OrderNotFoundException.class, () -> orderMongoAdapter.getOrderCollectionsByIdClient(idClient));
 
         verify(orderCollectionRepository, times(1)).findByIdClient(idClient);
     }
@@ -114,7 +115,7 @@ class OrderMongoAdapterTest {
 
         when(orderCollectionRepository.findByIdOrder(idOrder)).thenReturn(Optional.empty());
 
-        assertThrows(DishNotFoundException.class, () -> orderMongoAdapter.assignOrderCollection(idOrder, idEmployee, newStatus));
+        assertThrows(OrderNotFoundException.class, () -> orderMongoAdapter.assignOrderCollection(idOrder, idEmployee, newStatus));
 
         verify(orderCollectionRepository, times(1)).findByIdOrder(idOrder);
     }
@@ -128,9 +129,9 @@ class OrderMongoAdapterTest {
 
         when(orderCollectionRepository.findByIdOrder(idOrder)).thenReturn(Optional.of(orderCollection));
 
-        orderMongoAdapter.changeOrderCollectionStatus(idOrder,newStatus,finalDate);
+        orderMongoAdapter.changeOrderCollectionStatus(idOrder, newStatus, finalDate);
 
-        verify(orderCollectionRepository,times(1)).findByIdOrder(idOrder);
+        verify(orderCollectionRepository, times(1)).findByIdOrder(idOrder);
     }
 
     @Test
@@ -140,7 +141,7 @@ class OrderMongoAdapterTest {
         Date finalDate = new Date();
         when(orderCollectionRepository.findByIdOrder(idOrder)).thenReturn(Optional.empty());
 
-        assertThrows(DishNotFoundException.class, () -> orderMongoAdapter.changeOrderCollectionStatus(idOrder, newStatus,finalDate));
+        assertThrows(OrderNotFoundException.class, () -> orderMongoAdapter.changeOrderCollectionStatus(idOrder, newStatus, finalDate));
 
         verify(orderCollectionRepository, times(1)).findByIdOrder(idOrder);
     }
@@ -164,8 +165,61 @@ class OrderMongoAdapterTest {
         Long newStatus = 1L;
         when(orderCollectionRepository.findByIdOrder(idOrder)).thenReturn(Optional.empty());
 
-        assertThrows(DishNotFoundException.class, () -> orderMongoAdapter.updateOrderCollectionStatus(idOrder, newStatus));
+        assertThrows(OrderNotFoundException.class, () -> orderMongoAdapter.updateOrderCollectionStatus(idOrder, newStatus));
 
         verify(orderCollectionRepository, times(1)).findByIdOrder(idOrder);
+    }
+
+    @Test
+    void getOrdersDuration() {
+        Long idRestaurant = 1L;
+        OrderCollection orderCollection = new OrderCollection();
+        OrderDocument orderDocument = new OrderDocument(null,null,null,null,null,null,null,null,null,null);
+
+        when(orderCollectionRepository.findByAndIdRestaurantAndActualStatusNot(idRestaurant, Constants.ORDER_STATUS_PENDING, Constants.ORDER_STATUS_PREPARING)).thenReturn(List.of(orderCollection));
+        when(orderCollectionMapper.toOrderDocumentList(List.of(orderCollection))).thenReturn(List.of(orderDocument));
+
+        orderMongoAdapter.getOrdersDuration(idRestaurant);
+
+        verify(orderCollectionRepository, times(1)).findByAndIdRestaurantAndActualStatusNot(idRestaurant, Constants.ORDER_STATUS_PENDING, Constants.ORDER_STATUS_PREPARING);
+        verify(orderCollectionMapper, times(1)).toOrderDocumentList(List.of(orderCollection));
+    }
+
+    @Test
+    void getOrdersDuration_Conflict() {
+        Long idRestaurant = 1L;
+        when(orderCollectionRepository.findByAndIdRestaurantAndActualStatusNot(idRestaurant, Constants.ORDER_STATUS_PENDING, Constants.ORDER_STATUS_PREPARING)).thenReturn(List.of());
+
+        assertThrows(OrderNotFoundException.class, () -> orderMongoAdapter.getOrdersDuration(idRestaurant));
+
+        verify(orderCollectionRepository, times(1)).findByAndIdRestaurantAndActualStatusNot(idRestaurant, Constants.ORDER_STATUS_PENDING, Constants.ORDER_STATUS_PREPARING);
+    }
+
+
+    @Test
+    void getOrdersByIdRestaurantOrderedByIdEmployee() {
+        Long idRestaurant = 1L;
+        Sort sort = Sort.by(Sort.Direction.ASC, "idEmployee");
+        OrderCollection orderCollection = new OrderCollection();
+        OrderDocument orderDocument = new OrderDocument(null,null,null,null,null,null,null,null,null,null);
+
+        when(orderCollectionRepository.getOrdersByIdRestaurantOrderedByIdEmployee(idRestaurant, Constants.ORDER_STATUS_PENDING, Constants.ORDER_STATUS_PREPARING, sort)).thenReturn(List.of(orderCollection));
+        when(orderCollectionMapper.toOrderDocumentList(List.of(orderCollection))).thenReturn(List.of(orderDocument));
+
+        orderMongoAdapter.getOrdersByIdRestaurantOrderedByIdEmployee(idRestaurant);
+
+        verify(orderCollectionRepository, times(1)).getOrdersByIdRestaurantOrderedByIdEmployee(idRestaurant, Constants.ORDER_STATUS_PENDING, Constants.ORDER_STATUS_PREPARING, sort);
+        verify(orderCollectionMapper, times(1)).toOrderDocumentList(List.of(orderCollection));
+    }
+
+    @Test
+    void getOrdersByIdRestaurantOrderedByIdEmployee_Conflict() {
+        Long idRestaurant = 1L;
+        Sort sort = Sort.by(Sort.Direction.ASC, "idEmployee");
+        when(orderCollectionRepository.getOrdersByIdRestaurantOrderedByIdEmployee(idRestaurant, Constants.ORDER_STATUS_PENDING, Constants.ORDER_STATUS_PREPARING, sort)).thenReturn(List.of());
+
+        assertThrows(OrderNotFoundException.class, () -> orderMongoAdapter.getOrdersByIdRestaurantOrderedByIdEmployee(idRestaurant));
+
+        verify(orderCollectionRepository, times(1)).getOrdersByIdRestaurantOrderedByIdEmployee(idRestaurant, Constants.ORDER_STATUS_PENDING, Constants.ORDER_STATUS_PREPARING, sort);
     }
 }

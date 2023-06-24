@@ -5,10 +5,7 @@ import com.pragma.powerup.restaurantmicroservice.domain.auth.IPrincipalUser;
 import com.pragma.powerup.restaurantmicroservice.domain.geteway.IHttpAdapter;
 import com.pragma.powerup.restaurantmicroservice.domain.model.*;
 import com.pragma.powerup.restaurantmicroservice.domain.spi.mongo.IOrderCollectionPersistencePort;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IDishPersistencePort;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IEmployeePersistencePort;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IOrderDishPersistencePort;
-import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.IOrderPersistencePort;
+import com.pragma.powerup.restaurantmicroservice.domain.spi.mySql.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,10 +13,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
 
@@ -28,6 +22,8 @@ class OrderUseCaseTest {
 
     @Mock
     private IOrderPersistencePort orderPersistencePort;
+    @Mock
+    private IRestaurantPersistencePort restaurantPersistencePort;
     @Mock
     private IOrderCollectionPersistencePort orderCollectionPersistencePort;
     @Mock
@@ -221,7 +217,8 @@ class OrderUseCaseTest {
 
     @Test
     void saveTraceabilityOrder() {
-        Order orderInformation = new Order(null, null, null, null, null, null, null);
+        Restaurant restaurant = new Restaurant(null,null,null,null,null,null,null);
+        Order orderInformation = new Order(null, null, null, null, null, null, restaurant);
         List<Map<String, String>> dishesMapped = new ArrayList<>();
 
         doNothing().when(orderCollectionPersistencePort).saveOrderCollection(Mockito.any(OrderDocument.class));
@@ -235,29 +232,29 @@ class OrderUseCaseTest {
     void getTraceabilityOrder() {
         String role = Constants.CLIENT_ROLE_NAME;
         Long idOrder = 1L;
-        OrderDocument orderDocument = new OrderDocument(null, null, null, null, null, null, null, null, null);
+        OrderDocument orderDocument = new OrderDocument(null,null, null, null, null, null, null, null, null, null);
 
         when(authUser.getRole()).thenReturn(role);
-        when(orderCollectionPersistencePort.getOrderCollection(idOrder)).thenReturn(orderDocument);
+        when(orderCollectionPersistencePort.getOrderCollectionByIdOrder(idOrder)).thenReturn(orderDocument);
 
         orderUseCase.getTraceabilityOrder(idOrder);
 
-        verify(orderCollectionPersistencePort, times(1)).getOrderCollection(idOrder);
+        verify(orderCollectionPersistencePort, times(1)).getOrderCollectionByIdOrder(idOrder);
     }
 
     @Test
     void getTraceabilityOrders() {
         String role = Constants.CLIENT_ROLE_NAME;
         Long idOrder = 1L;
-        OrderDocument orderDocument = new OrderDocument(null, null, null, null, null, null, null, null, null);
+        OrderDocument orderDocument = new OrderDocument(null, null, null, null,null, null, null, null, null, null);
 
         when(authUser.getRole()).thenReturn(role);
         when(authUser.getIdUser()).thenReturn(idOrder);
-        when(orderCollectionPersistencePort.getOrderCollections(idOrder)).thenReturn(List.of(orderDocument));
+        when(orderCollectionPersistencePort.getOrderCollectionsByIdClient(idOrder)).thenReturn(List.of(orderDocument));
 
         orderUseCase.getTraceabilityOrders();
 
-        verify(orderCollectionPersistencePort, times(1)).getOrderCollections(idOrder);
+        verify(orderCollectionPersistencePort, times(1)).getOrderCollectionsByIdClient(idOrder);
     }
 
     @Test
@@ -297,5 +294,53 @@ class OrderUseCaseTest {
         orderUseCase.updateOrderCollectionStatus(idOrder,newStatus);
 
         verify(orderCollectionPersistencePort,times(1)).updateOrderCollectionStatus(idOrder,newStatus);
+    }
+
+    @Test
+    void getOrdersDuration() {
+        Long idRestaurant = 1L;
+        Long idUser = 1L;
+        String role = Constants.OWNER_ROLE_NAME;
+        Restaurant restaurant = new Restaurant(idRestaurant,null,null,null,null,null,null);
+        OrderDocument orderDocument = new OrderDocument(null,null,null,null,null,null,null,null,null,null);
+
+        when(authUser.getRole()).thenReturn(role);
+        when(authUser.getIdUser()).thenReturn(idUser);
+        when(restaurantPersistencePort.getRestaurantByIdOwnerAndIdRestaurant(idUser,idRestaurant)).thenReturn(restaurant);
+        when(orderCollectionPersistencePort.getOrdersDuration(idRestaurant)).thenReturn(List.of(orderDocument));
+
+        orderUseCase.getOrdersDuration(idRestaurant);
+
+        verify(restaurantPersistencePort,times(1)).getRestaurantByIdOwnerAndIdRestaurant(idUser,idRestaurant);
+        verify(orderCollectionPersistencePort,times(1)).getOrdersDuration(idRestaurant);
+    }
+
+    @Test
+    void getRankingEmployeesByRestaurant() {
+        Long idRestaurant = 1L;
+        Long idUser = 1L;
+        String role = Constants.OWNER_ROLE_NAME;
+        Restaurant restaurant = new Restaurant(idRestaurant,null,null,null,null,null,null);
+        Date initDate = parseDate(18,0,0).getTime();
+        Date endDate = parseDate(19,21,0).getTime();
+
+        OrderDocument orderDocument = new OrderDocument("213",1L,1L,8L,1L,initDate,endDate,1L,1L,null);
+        when(authUser.getRole()).thenReturn(role);
+        when(authUser.getIdUser()).thenReturn(idUser);
+        when(restaurantPersistencePort.getRestaurantByIdOwnerAndIdRestaurant(idUser,idRestaurant)).thenReturn(restaurant);
+        when(orderCollectionPersistencePort.getOrdersByIdRestaurantOrderedByIdEmployee(idRestaurant)).thenReturn(List.of(orderDocument));
+
+        orderUseCase.getRankingEmployeesByRestaurant(idRestaurant);
+
+        verify(restaurantPersistencePort,times(1)).getRestaurantByIdOwnerAndIdRestaurant(idUser,idRestaurant);
+        verify(orderCollectionPersistencePort,times(1)).getOrdersByIdRestaurantOrderedByIdEmployee(idRestaurant);
+    }
+
+    public Calendar parseDate(int hours,int minutes, int seconds){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, hours);
+        calendar.set(Calendar.MINUTE, minutes);
+        calendar.set(Calendar.SECOND, seconds);
+        return calendar;
     }
 }

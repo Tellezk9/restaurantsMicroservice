@@ -3,10 +3,12 @@ package com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mongo.adap
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mongo.collection.OrderCollection;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mongo.mappers.IOrderCollectionMapper;
 import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mongo.repositories.IOrderCollectionRepository;
-import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.exceptions.DishNotFoundException;
+import com.pragma.powerup.restaurantmicroservice.adapters.driven.jpa.mysql.exceptions.OrderNotFoundException;
+import com.pragma.powerup.restaurantmicroservice.configuration.Constants;
 import com.pragma.powerup.restaurantmicroservice.domain.model.OrderDocument;
 import com.pragma.powerup.restaurantmicroservice.domain.spi.mongo.IOrderCollectionPersistencePort;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Sort;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,27 +22,26 @@ public class OrderMongoAdapter implements IOrderCollectionPersistencePort {
 
     @Override
     public void saveOrderCollection(OrderDocument orderDocument) {
-        OrderCollection orderCollection = orderCollectionMapper.toOrderCollection(orderDocument);
-        orderCollectionRepository.save(orderCollection);
+        orderCollectionRepository.save(orderCollectionMapper.toOrderCollection(orderDocument));
     }
 
     @Override
-    public OrderDocument getOrderCollection(Long idOrder) {
+    public OrderDocument getOrderCollectionByIdOrder(Long idOrder) {
         Optional<OrderCollection> orderCollection = orderCollectionRepository.findByIdOrder(idOrder);
 
-        if (orderCollection.isEmpty()){
-            throw new DishNotFoundException();
+        if (orderCollection.isEmpty()) {
+            throw new OrderNotFoundException();
         }
 
         return orderCollectionMapper.toOrderDocument(orderCollection.get());
     }
 
     @Override
-    public List<OrderDocument> getOrderCollections(Long idClient) {
+    public List<OrderDocument> getOrderCollectionsByIdClient(Long idClient) {
         List<OrderCollection> orderCollection = orderCollectionRepository.findByIdClient(idClient);
 
-        if (orderCollection.isEmpty()){
-            throw new DishNotFoundException();
+        if (orderCollection.isEmpty()) {
+            throw new OrderNotFoundException();
         }
 
         return orderCollectionMapper.toOrderDocumentList(orderCollection);
@@ -51,7 +52,7 @@ public class OrderMongoAdapter implements IOrderCollectionPersistencePort {
         Optional<OrderCollection> orderCollection = orderCollectionRepository.findByIdOrder(idOrder);
 
         if (orderCollection.isEmpty()) {
-            throw new DishNotFoundException();
+            throw new OrderNotFoundException();
         }
         orderCollection.get().setIdEmployee(idEmployee);
         orderCollection.get().setPreviousStatus(orderCollection.get().getActualStatus());
@@ -65,7 +66,7 @@ public class OrderMongoAdapter implements IOrderCollectionPersistencePort {
         Optional<OrderCollection> orderCollection = orderCollectionRepository.findByIdOrder(idOrder);
 
         if (orderCollection.isEmpty()) {
-            throw new DishNotFoundException();
+            throw new OrderNotFoundException();
         }
         orderCollection.get().setDateEnd(new SimpleDateFormat().format(finalDate));
         orderCollection.get().setPreviousStatus(orderCollection.get().getActualStatus());
@@ -79,11 +80,32 @@ public class OrderMongoAdapter implements IOrderCollectionPersistencePort {
         Optional<OrderCollection> orderCollection = orderCollectionRepository.findByIdOrder(idOrder);
 
         if (orderCollection.isEmpty()) {
-            throw new DishNotFoundException();
+            throw new OrderNotFoundException();
         }
         orderCollection.get().setPreviousStatus(orderCollection.get().getActualStatus());
         orderCollection.get().setActualStatus(newStatus);
 
         orderCollectionRepository.save(orderCollection.get());
+    }
+
+    @Override
+    public List<OrderDocument> getOrdersDuration(Long idRestaurant) {
+        List<OrderCollection> orderCollections = orderCollectionRepository.findByAndIdRestaurantAndActualStatusNot(idRestaurant, Constants.ORDER_STATUS_PENDING, Constants.ORDER_STATUS_PREPARING);
+
+        if (orderCollections.isEmpty()) {
+            throw new OrderNotFoundException();
+        }
+        return orderCollectionMapper.toOrderDocumentList(orderCollections);
+    }
+
+    @Override
+    public List<OrderDocument> getOrdersByIdRestaurantOrderedByIdEmployee(Long idRestaurant) {
+        Sort sort = Sort.by(Sort.Direction.ASC, "idEmployee");
+        List<OrderCollection> orderCollections = orderCollectionRepository.getOrdersByIdRestaurantOrderedByIdEmployee(idRestaurant, Constants.ORDER_STATUS_PENDING, Constants.ORDER_STATUS_PREPARING, sort);
+
+        if (orderCollections.isEmpty()) {
+            throw new OrderNotFoundException();
+        }
+        return orderCollectionMapper.toOrderDocumentList(orderCollections);
     }
 }

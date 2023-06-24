@@ -2,9 +2,7 @@ package com.pragma.powerup.restaurantmicroservice.adapters.driving.http.controll
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.request.OrderRequestDto;
-import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderDishResponseDto;
-import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderDocumentResponseDto;
-import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderResponseDto;
+import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.*;
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.handlers.IOrderHandler;
 import com.pragma.powerup.restaurantmicroservice.configuration.Constants;
 import org.junit.jupiter.api.BeforeEach;
@@ -196,5 +194,37 @@ class OrderRestControllerTest {
                 .andExpect(jsonPath("$[0]previousStatus").value(orderDocumentResponseDto.get(0).getPreviousStatus()))
                 .andExpect(jsonPath("$[0]actualStatus").value(orderDocumentResponseDto.get(0).getActualStatus()))
                 .andExpect(jsonPath("$[0]order").value(orderDocumentResponseDto.get(0).getOrder()));
+    }
+
+    @Test
+    void getOrdersDuration() throws Exception {
+        Long idRestaurant = 1L;
+        List<OrderDurationResponseDto> orderDurationResponseDtoList = List.of(new OrderDurationResponseDto(1L,null,null,null));
+        when(orderHandler.getOrdersDuration(idRestaurant)).thenReturn(orderDurationResponseDtoList);
+
+        mockMvc.perform(get("/order/getOrdersDuration")
+                        .param("idRestaurant",String.valueOf(idRestaurant)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0]idOrder").value(orderDurationResponseDtoList.get(0).getIdOrder()))
+                .andExpect(jsonPath("$[0]dateInit").value(orderDurationResponseDtoList.get(0).getDateInit()))
+                .andExpect(jsonPath("$[0]dateEnd").value(orderDurationResponseDtoList.get(0).getDateEnd()))
+                .andExpect(jsonPath("$[0]order").value(orderDurationResponseDtoList.get(0).getOrder()));
+    }
+
+    @Test
+    void getRankingEmployees() throws Exception {
+        Long idRestaurant = 1L;
+        List<RankingEmployeeResponseDto> rankingEmployeeResponseDtoList = List.of(new RankingEmployeeResponseDto(1L,null));
+        when(orderHandler.getRankingEmployees(idRestaurant)).thenReturn(rankingEmployeeResponseDtoList);
+
+        mockMvc.perform(get("/order/getRankingEmployees")
+                        .param("idRestaurant",String.valueOf(idRestaurant)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0]idEmployee").value(rankingEmployeeResponseDtoList.get(0).getIdEmployee()))
+                .andExpect(jsonPath("$[0]averageMinutes").value(rankingEmployeeResponseDtoList.get(0).getAverageMinutes()));
     }
 }

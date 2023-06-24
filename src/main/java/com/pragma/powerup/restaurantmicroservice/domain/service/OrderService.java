@@ -5,6 +5,7 @@ import com.pragma.powerup.restaurantmicroservice.domain.exceptions.*;
 import com.pragma.powerup.restaurantmicroservice.domain.model.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class OrderService {
@@ -119,15 +120,60 @@ public class OrderService {
 
 
     public OrderDocument makeNewOrderDocument(Order orderInformation, List<Map<String, String>> dishesMapped) {
-
         Long idOrder = orderInformation.getId();
         Long idClient = orderInformation.getIdClient();
         Long idEmployee = null;
+        Long idRestaurant = orderInformation.getRestaurant().getId();
         Date dateInit = orderInformation.getDate();
         Date dateEnd = null;
         Long previousStatus = null;
         Long actualStatus = orderInformation.getStatus();
         List<Map<String, String>> order = dishesMapped;
-        return new OrderDocument(null, idOrder, idClient, idEmployee, dateInit, dateEnd, previousStatus, actualStatus, order);
+        return new OrderDocument(null, idOrder, idClient, idEmployee, idRestaurant, dateInit, dateEnd, previousStatus, actualStatus, order);
+    }
+
+    public List<RankingEmployee> calculateAverageTimesBetweenOrders(List<OrderDocument> orderDocumentList) {
+        if (orderDocumentList.isEmpty()){
+            return List.of(new RankingEmployee(null,null));
+        }
+        Long actualEmployee;
+        Long previousEmployee = 0L;
+        Long sumMinutes = 0L;
+        int countOrders = 0;
+        List<RankingEmployee> rankingEmployeesList = new ArrayList<>();
+        List<Map<String, Long>> averageTimes = new ArrayList<>();
+
+        for (int i = 0; i < orderDocumentList.size(); i++) {
+            actualEmployee = orderDocumentList.get(i).getIdEmployee();
+            Date initDate = orderDocumentList.get(i).getDateInit();
+            Date endDate = orderDocumentList.get(i).getDateEnd();
+
+            if (previousEmployee != 0L && (!actualEmployee.equals(previousEmployee))) {
+                Map<String, Long> times = new HashMap<>();
+                Long average = sumMinutes / countOrders;
+                times.put("average", average);
+                times.put("idEmployee", previousEmployee);
+                averageTimes.add(times);
+                sumMinutes = 0L;
+                countOrders = 0;
+            }
+            sumMinutes += ((endDate.getTime() - initDate.getTime()) / 1000) / 60;
+            countOrders++;
+            previousEmployee = actualEmployee;
+        }
+        if (previousEmployee != null && countOrders > 0) {
+            Long averageMinutes = sumMinutes / countOrders;
+            Map<String, Long> times = new HashMap<>();
+            times.put("average", averageMinutes);
+            times.put("idEmployee", previousEmployee);
+            averageTimes.add(times);
+        }
+
+        rankingEmployeesList = averageTimes.stream()
+                .map(time -> new RankingEmployee(time.get("idEmployee"), time.get("average")))
+                .sorted(Comparator.comparingLong(RankingEmployee::getAverage))
+                .collect(Collectors.toList());
+
+        return rankingEmployeesList;
     }
 }

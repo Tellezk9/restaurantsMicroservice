@@ -41,7 +41,7 @@ class OrderMysqlAdapterTest {
         RestaurantEntity restaurantEntity = new RestaurantEntity(1L, null, null, null, null, null, null);
         OrderEntity orderEntity = new OrderEntity(1L, 1L, null, 2L, null, restaurantEntity, null);
 
-        when(orderRepository.findByIdClientAndRestaurantEntityIdAndStatusNot(order.getIdClient(), order.getRestaurant().getId(), Constants.ORDER_STATUS_OK)).thenReturn(Optional.empty());
+        when(orderRepository.findByIdClientAndRestaurantEntityIdAndStatusNotAndStatusNotAndStatusNot(order.getIdClient(), order.getRestaurant().getId(), Constants.ORDER_STATUS_OK, Constants.ORDER_STATUS_DELIVERED, Constants.ORDER_STATUS_CANCELED)).thenReturn(Optional.empty());
         when(orderEntityMapper.toOrderEntity(order)).thenReturn(orderEntity);
 
         orderMysqlAdapter.saveOrderInformation(order);
@@ -57,7 +57,7 @@ class OrderMysqlAdapterTest {
         RestaurantEntity restaurantEntity = new RestaurantEntity(1L, null, null, null, null, null, null);
         OrderEntity orderEntity = new OrderEntity(1L, 1L, null, 2L, null, restaurantEntity, null);
 
-        when(orderRepository.findByIdClientAndRestaurantEntityIdAndStatusNot(order.getIdClient(), order.getRestaurant().getId(), Constants.ORDER_STATUS_OK)).thenReturn(Optional.of(orderEntity));
+        when(orderRepository.findByIdClientAndRestaurantEntityIdAndStatusNotAndStatusNotAndStatusNot(order.getIdClient(), order.getRestaurant().getId(), Constants.ORDER_STATUS_OK, Constants.ORDER_STATUS_DELIVERED, Constants.ORDER_STATUS_CANCELED)).thenReturn(Optional.of(orderEntity));
 
         assertThrows(ClientHasPendingOrderException.class, () -> orderMysqlAdapter.saveOrderInformation(order));
     }
@@ -268,7 +268,7 @@ class OrderMysqlAdapterTest {
 
         when(orderRepository.findBySecurityPinAndRestaurantEntityId(securityPin, idRestaurant)).thenReturn(Optional.empty());
 
-        assertThrows(OrderNotFoundException.class,()->orderMysqlAdapter.getOrderBySecurityPinAndIdRestaurant(securityPin,idRestaurant));
+        assertThrows(OrderNotFoundException.class, () -> orderMysqlAdapter.getOrderBySecurityPinAndIdRestaurant(securityPin, idRestaurant));
 
         verify(orderRepository, times(1)).findBySecurityPinAndRestaurantEntityId(securityPin, idRestaurant);
     }

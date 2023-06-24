@@ -6,10 +6,7 @@ import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.respo
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.mapper.IOrderDishResponseMapper;
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.mapper.IOrderResponseMapper;
 import com.pragma.powerup.restaurantmicroservice.domain.api.IOrderServicePort;
-import com.pragma.powerup.restaurantmicroservice.domain.model.Dish;
-import com.pragma.powerup.restaurantmicroservice.domain.model.Order;
-import com.pragma.powerup.restaurantmicroservice.domain.model.OrderDish;
-import com.pragma.powerup.restaurantmicroservice.domain.model.Restaurant;
+import com.pragma.powerup.restaurantmicroservice.domain.model.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -121,5 +118,29 @@ class OrderHandlerImplTest {
         orderHandler.cancelOrder(idOrder);
 
         verify(orderServicePort, times(1)).cancelOrder(idOrder);
+    }
+
+    @Test
+    void getOrdersDuration() {
+        Long idRestaurant = 1L;
+        OrderDocument orderDocument = new OrderDocument(null,null,null,null,null,null,null,null,null,null);
+
+        when(orderServicePort.getOrdersDuration(idRestaurant)).thenReturn(List.of(orderDocument));
+
+        orderHandler.getOrdersDuration(idRestaurant);
+
+        verify(orderServicePort, times(1)).getOrdersDuration(idRestaurant);
+    }
+
+    @Test
+    void getRankingEmployeesByRestaurant() {
+        Long idRestaurant = 1L;
+        RankingEmployee rankingEmployee = new RankingEmployee(1L,null);
+
+        when(orderServicePort.getRankingEmployeesByRestaurant(idRestaurant)).thenReturn(List.of(rankingEmployee));
+
+        orderHandler.getRankingEmployees(idRestaurant);
+
+        verify(orderServicePort, times(1)).getRankingEmployeesByRestaurant(idRestaurant);
     }
 }
