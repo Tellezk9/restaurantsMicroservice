@@ -9,17 +9,19 @@ public class OrderDocument {
     private Long idOrder;
     private Long idClient;
     private Long idEmployee;
+    private Long idRestaurant;
     private Date dateInit;
     private Date dateEnd;
     private Long previousStatus;
     private Long actualStatus;
     private List<Map<String, String>> order;
 
-    public OrderDocument(String id, Long idOrder, Long idClient, Long idEmployee, Date dateInit, Date dateEnd, Long previousStatus, Long actualStatus, List<Map<String, String>> order) {
+    public OrderDocument(String id, Long idOrder, Long idClient, Long idEmployee, Long idRestaurant, Date dateInit, Date dateEnd, Long previousStatus, Long actualStatus, List<Map<String, String>> order) {
         this.id = id;
         this.idOrder = idOrder;
         this.idClient = idClient;
         this.idEmployee = idEmployee;
+        this.idRestaurant = idRestaurant;
         this.dateInit = dateInit;
         this.dateEnd = dateEnd;
         this.previousStatus = previousStatus;
@@ -57,6 +59,14 @@ public class OrderDocument {
 
     public void setIdEmployee(Long idEmployee) {
         this.idEmployee = idEmployee;
+    }
+
+    public Long getIdRestaurant() {
+        return idRestaurant;
+    }
+
+    public void setIdRestaurant(Long idRestaurant) {
+        this.idRestaurant = idRestaurant;
     }
 
     public Date getDateInit() {

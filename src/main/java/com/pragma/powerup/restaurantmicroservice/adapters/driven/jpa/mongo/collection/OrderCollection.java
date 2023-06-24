@@ -22,6 +22,7 @@ public class OrderCollection {
     private Long idOrder;
     private Long idClient;
     private Long idEmployee;
+    private Long idRestaurant;
     private String dateInit;
     private String dateEnd;
     private Long previousStatus;

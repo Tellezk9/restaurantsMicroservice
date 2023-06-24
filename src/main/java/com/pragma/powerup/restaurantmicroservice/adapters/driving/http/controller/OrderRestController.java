@@ -1,9 +1,7 @@
 package com.pragma.powerup.restaurantmicroservice.adapters.driving.http.controller;
 
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.request.OrderRequestDto;
-import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderDishResponseDto;
-import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderDocumentResponseDto;
-import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderResponseDto;
+import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.*;
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.handlers.IOrderHandler;
 import com.pragma.powerup.restaurantmicroservice.configuration.Constants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -148,5 +146,29 @@ public class OrderRestController {
     @GetMapping("/getTraceabilityOrders")
     public ResponseEntity<List<OrderDocumentResponseDto>> getTraceabilityOrders() {
         return ResponseEntity.ok(orderHandler.getTraceabilityOrders());
+    }
+
+    @Operation(summary = "Get the duration of orders",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "All duration of orders returned",
+                            content = @Content(mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = OrderDurationResponseDto.class)))),
+                    @ApiResponse(responseCode = "404", description = "No data found",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
+    @GetMapping("/getOrdersDuration")
+    public ResponseEntity<List<OrderDurationResponseDto>> getOrdersDuration(@RequestParam Long idRestaurant) {
+        return ResponseEntity.ok(orderHandler.getOrdersDuration(idRestaurant));
+    }
+
+    @Operation(summary = "get ranking employees by restaurant",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "All restaurant dishes returned",
+                            content = @Content(mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = RankingEmployeeResponseDto.class)))),
+                    @ApiResponse(responseCode = "404", description = "No data found",
+                            content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
+    @GetMapping("/getRankingEmployees")
+    public ResponseEntity<List<RankingEmployeeResponseDto>> getRankingEmployees(@RequestParam Long idRestaurant) {
+        return ResponseEntity.ok(orderHandler.getRankingEmployees(idRestaurant));
     }
 }

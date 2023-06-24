@@ -5,6 +5,7 @@ import com.pragma.powerup.restaurantmicroservice.domain.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.text.ParseException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -161,13 +162,36 @@ class OrderServiceTest {
         mapExpect.put("nameDish", "nameTest");
         List<Map<String, String>> dishesMapper = new ArrayList<>();
         dishesMapper.add(mapExpect);
-        OrderDocument expectedOrder = new OrderDocument(null,idOrder,null,null,null,null,null,null,dishesMapper);
-        Order order = new Order(idOrder, null, null, null, null, null, null);
+        Restaurant restaurant = new Restaurant(null,null,null,null,null,null,null);
+        OrderDocument expectedOrder = new OrderDocument(null,idOrder,null,null,null,null,null,null,null,dishesMapper);
+        Order order = new Order(idOrder, null, null, null, null, null, restaurant);
 
         OrderDocument actualOrder = orderService.makeNewOrderDocument(order, dishesMapper);
 
         assertEquals(expectedOrder.getIdOrder(),actualOrder.getIdOrder());
         assertEquals(expectedOrder.getOrder(),actualOrder.getOrder());
+    }
+
+    @Test
+    void calculateAverageTimesBetweenOrders() {
+        Date initDate = parseDate(18,0,0).getTime();
+        Date endDate = parseDate(19,21,0).getTime();
+
+        OrderDocument orderDocument = new OrderDocument("213",1L,1L,8L,1L,initDate,endDate,1L,1L,null);
+        RankingEmployee rankingEmployee = new RankingEmployee(8L,81L);
+
+        List<RankingEmployee> resultActual = orderService.calculateAverageTimesBetweenOrders(List.of(orderDocument));
+
+        assertEquals(resultActual.get(0).getIdEmployee(),rankingEmployee.getIdEmployee());
+        assertEquals(resultActual.get(0).getAverage(),rankingEmployee.getAverage());
+    }
+
+    public Calendar parseDate(int hours,int minutes, int seconds){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, hours);
+        calendar.set(Calendar.MINUTE, minutes);
+        calendar.set(Calendar.SECOND, seconds);
+        return calendar;
     }
 
 }

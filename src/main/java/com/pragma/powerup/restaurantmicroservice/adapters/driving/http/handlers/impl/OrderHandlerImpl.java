@@ -1,9 +1,7 @@
 package com.pragma.powerup.restaurantmicroservice.adapters.driving.http.handlers.impl;
 
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.request.OrderRequestDto;
-import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderDishResponseDto;
-import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderDocumentResponseDto;
-import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.OrderResponseDto;
+import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.dto.response.*;
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.handlers.IOrderHandler;
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.mapper.IOrderDishResponseMapper;
 import com.pragma.powerup.restaurantmicroservice.adapters.driving.http.mapper.IOrderResponseMapper;
@@ -65,4 +63,15 @@ public class OrderHandlerImpl implements IOrderHandler {
     public List<OrderDocumentResponseDto> getTraceabilityOrders() {
         return orderResponseMapper.toOrderDocumentResponseDtoList(orderServicePort.getTraceabilityOrders());
     }
+
+    @Override
+    public List<OrderDurationResponseDto> getOrdersDuration(Long idRestaurant) {
+        return orderResponseMapper.toListOrderDurationResponseDto(orderServicePort.getOrdersDuration(idRestaurant));
+    }
+
+    @Override
+    public List<RankingEmployeeResponseDto> getRankingEmployees(Long idRestaurant) {
+        return orderResponseMapper.toListRankingEmployeeResponseDto(orderServicePort.getRankingEmployeesByRestaurant(idRestaurant));
+    }
+
 }
