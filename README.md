@@ -1,8 +1,8 @@
-<br /><
+<br />
 <div align="center">
-<h3 align="center">PRAGMA POWER-UP</h3>
+  <h2>Restaurant Microservice</h2>
   <p align="center">
-    In this challenge you are going to design the backend of a system that centralizes the services and orders of a restaurant chain that has different branches in the city.
+   Backend of a system that centralizes the services and orders of a restaurant chain that has different branches in the city.
   </p>
 </div>
 
